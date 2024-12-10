@@ -9,7 +9,7 @@ terraform {
     organization = "f5xc-tenant-ops"
 
     workspaces {
-      name = "tops-infra-dev"
+      name = "tops-infra-${var.environment}"
     }
   }
 }
@@ -18,13 +18,20 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_s3_bucket" "this_bucket" {
-  bucket        = "tops-cert-bucket-${var.environment}"
-  force_destroy = true
-
+module "cert_bucket" {
+  source      = "./modules/bucket"
+  bucket_name = "tops-cert-bucket-${var.environment}"
   tags = {
     Environment = var.environment
     ManagedBy   = "Terraform"
     Owner       = "f5xc-tenant-ops"
   }
+}
+
+output "cert_bucket_name" {
+  value = module.common_s3.cert_bucket_name
+}
+
+output "cert_bucket_arn" {
+  value = module.common_s3.cert_bucket_arn
 }
