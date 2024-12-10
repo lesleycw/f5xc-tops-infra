@@ -9,3 +9,9 @@ variable "bucket_name" {
   type        = string
   default     = "cert-bucket-dev"
 }
+
+variable "environment" {
+  description = "The branch name or workspace name to suffix resource names"
+  type        = string
+  default     = ""
+}
