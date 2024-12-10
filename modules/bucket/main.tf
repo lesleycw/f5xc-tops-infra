@@ -10,7 +10,7 @@ variable "tags" {
   default     = {}
 }
 
-resource "aws_s3_bucket" "this_bucket" {
+resource "aws_s3_bucket" "bucket" {
   bucket        = var.bucket_name
   force_destroy = true
 
@@ -23,10 +23,10 @@ resource "aws_s3_bucket" "this_bucket" {
 
 output "cert_bucket_name" {
   description = "The name of the S3 bucket"
-  value       = aws_s3_bucket.this_bucket.bucket
+  value       = aws_s3_bucket.bucket.bucket
 }
 
 output "cert_bucket_arn" {
   description = "The ARN of the S3 bucket"
-  value       = aws_s3_bucket.this_bucket.arn
+  value       = aws_s3_bucket.bucket.arn
 }
