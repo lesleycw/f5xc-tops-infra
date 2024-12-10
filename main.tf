@@ -18,12 +18,10 @@ provider "aws" {
   region = var.aws_region
 }
 
-module "cert_bucket" {
-  source      = "./modules/bucket"
-  bucket_name = "tops-cert-bucket-${var.environment}"
-  tags = {
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-    Owner       = "f5xc-tenant-ops"
-  }
+locals {
+    tags = {
+        Environment = var.environment
+        ManagedBy   = "Terraform"
+        Owner       = "f5xc-tenant-ops"
+    }
 }
