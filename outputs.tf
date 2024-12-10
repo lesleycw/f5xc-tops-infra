@@ -1,9 +1,7 @@
-output "bucket_name" {
-  description = "The name of the S3 bucket"
-  value       = aws_s3_bucket.this_bucket.bucket
+output "cert_bucket_name" {
+  value = module.cert_bucket.cert_bucket_name
 }
 
-output "bucket_arn" {
-  description = "The ARN of the S3 bucket"
-  value       = aws_s3_bucket.this_bucket.arn
+output "cert_bucket_arn" {
+  value = module.cert_bucket.cert_bucket_arn
 }
