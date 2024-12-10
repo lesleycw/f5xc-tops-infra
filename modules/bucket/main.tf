@@ -1,5 +1,3 @@
-/* Variables */
-
 variable "aws_region" {
   description = "AWS region for the S3 bucket"
   type        = string
@@ -18,7 +16,6 @@ variable "tags" {
   default     = {}
 }
 
-/* Resources */
 resource "aws_s3_bucket" "this_bucket" {
   bucket        = var.bucket_name
   force_destroy = true
@@ -30,7 +27,6 @@ resource "aws_s3_bucket" "this_bucket" {
   tags = var.tags
 }
 
-/* Outputs */
 output "cert_bucket_name" {
   description = "The name of the S3 bucket"
   value       = aws_s3_bucket.this_bucket.bucket
