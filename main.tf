@@ -28,8 +28,3 @@ resource "aws_s3_bucket" "this_bucket" {
     Owner       = "f5xc-tenant-ops"
   }
 }
-
-resource "aws_s3_bucket_acl" "this_bucket_acl" {
-  bucket = aws_s3_bucket.this_bucket.id
-  acl    = "private"
-}
