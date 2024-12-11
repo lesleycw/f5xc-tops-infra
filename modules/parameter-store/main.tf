@@ -31,6 +31,6 @@ resource "aws_ssm_parameter" "parameter" {
   allowed_pattern = ".*"
 
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = false
   }
 }

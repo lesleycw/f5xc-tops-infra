@@ -11,7 +11,5 @@ module "parameter_store" {
       value       = "https://f5-xc-lab.console.ves.volterra.io"
     }
   }
-
   default_tags    = local.tags
-  prevent_destroy = false
 }
