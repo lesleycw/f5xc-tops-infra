@@ -9,3 +9,10 @@ variable "environment" {
   type        = string
   default     = ""
 }
+
+variable "mcn_lab_token" {
+  description = "The token to use for the MCN Lab Tenant"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
