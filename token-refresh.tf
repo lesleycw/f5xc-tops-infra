@@ -1,4 +1,4 @@
-module "ecr" {
+module "token_refresh_ecr" {
   source          = "./modules/ecr"
   repository_name = "tops-token-refresh-${var.environment}"
   tags = local.tags

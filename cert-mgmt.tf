@@ -4,7 +4,7 @@ module "cert_bucket" {
   tags = local.tags
 }
 
-module "ecr" {
+module "cert_ecr" {
   source          = "./modules/ecr"
   repository_name = "tops-cert-mgmt-${var.environment}"
   tags = local.tags
