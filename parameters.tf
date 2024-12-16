@@ -1,3 +1,21 @@
+variable "mcn_lab_token" {
+  description = "Access token for the MCN Lab Tenant"
+  type        = string
+  sensitive   = true
+}
+
+variable "app_lab_token" {
+  description = "Access token for the App Lab Tenant"
+  type        = string
+  sensitive   = true
+}
+
+variable "sec_lab_token" {
+  description = "Access token for the Sec Lab Tenant"
+  type        = string
+  sensitive   = true
+}
+
 locals {
   app_base_path = "/tenantOps-${var.environment}/app-lab"
   mcn_base_path = "/tenantOps-${var.environment}/mcn-lab"
