@@ -4,7 +4,7 @@ locals {
   sec_base_path = "/tenantOps-${var.environment}/sec-lab"
 }
 
-module "parameter_store" {
+module "app_lab_parameters" {
   source = "./modules/parameter-store"
 
   parameters = {
@@ -24,7 +24,7 @@ module "parameter_store" {
   default_tags    = local.tags
 }
 
-module "parameter_store" {
+module "mcn_lab_parameters" {
   source = "./modules/parameter-store"
 
   parameters = {
@@ -44,7 +44,7 @@ module "parameter_store" {
   default_tags    = local.tags
 }
 
-module "parameter_store" {
+module "sec_lab_parameters" {
   source = "./modules/parameter-store"
 
   parameters = {

@@ -14,9 +14,16 @@ variable "mcn_lab_token" {
   description = "Access token for the MCN Lab Tenant"
   type        = string
   sensitive   = true
+}
 
-  validation {
-    condition     = length(var.mcn_lab_token) > 0
-    error_message = "The mcn_lab_token variable must not be empty."
-  }
+variable "app_lab_token" {
+  description = "Access token for the App Lab Tenant"
+  type        = string
+  sensitive   = true
+}
+
+variable "sec_lab_token" {
+  description = "Access token for the Sec Lab Tenant"
+  type        = string
+  sensitive   = true
 }
