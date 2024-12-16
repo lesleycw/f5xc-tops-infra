@@ -14,12 +14,6 @@ variable "default_tags" {
   default     = {}
 }
 
-variable "prevent_destroy" {
-  description = "Prevent the destruction of parameters."
-  type        = bool
-  default     = true
-}
-
 resource "aws_ssm_parameter" "parameter" {
   for_each       = var.parameters
   name           = each.key
@@ -32,6 +26,5 @@ resource "aws_ssm_parameter" "parameter" {
 
   lifecycle {
     create_before_destroy = true
-    prevent_destroy       = var.prevent_destroy
   }
 }
