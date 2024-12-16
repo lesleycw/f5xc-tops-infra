@@ -6,10 +6,10 @@ module "token_refresh_ecr" {
 
 output "token_refresh_ecr_url" {
   description = "The URL of the ECR repository"
-  value       = module.ecr.repository_url
+  value       = module.token_refresh_ecr.repository_url
 }
 
 output "token_refresh_ecr_arn" {
   description = "The ARN of the ECR repository"
-  value       = module.ecr.repository_arn
+  value       = module.token_refresh_ecr.repository_arn
 }

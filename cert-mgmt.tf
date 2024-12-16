@@ -20,10 +20,10 @@ output "cert_bucket_arn" {
 
 output "cert_ecr_url" {
   description = "The URL of the ECR repository"
-  value       = module.ecr.repository_url
+  value       = module.cert_ecr.repository_url
 }
 
 output "cert_ecr_arn" {
   description = "The ARN of the ECR repository"
-  value       = module.ecr.repository_arn
+  value       = module.cert_ecr.repository_arn
 }
