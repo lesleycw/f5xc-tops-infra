@@ -18,12 +18,22 @@ provider "aws" {
   region = var.aws_region
 }
 
-module "cert_bucket" {
-  source      = "./modules/bucket"
-  bucket_name = "tops-cert-bucket-${var.environment}"
-  tags = {
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-    Owner       = "f5xc-tenant-ops"
-  }
+locals {
+    tags = {
+        Environment = var.environment
+        ManagedBy   = "Terraform"
+        Owner       = "f5xc-tenant-ops"
+    }
+}
+
+variable "aws_region" {
+  description = "AWS region for the S3 bucket"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "environment" {
+  description = "The branch name or workspace name to suffix resource names"
+  type        = string
+  default     = ""
 }
