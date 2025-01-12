@@ -6,7 +6,7 @@ module "cert_bucket" {
 
 module "cert_ecr" {
   source          = "./modules/ecr"
-  repository_name = "tops-cert-mgmt-${var.environment}"
+  repository_name = "tops-cert-mgmt${var.environment == "prod" ? "" : "-${var.environment}"}"
   tags = local.tags
 }
 
