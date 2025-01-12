@@ -1,6 +1,7 @@
 module "cert_bucket" {
   source      = "./modules/bucket"
-  bucket_name = "tops-cert-bucket-${var.environment}"
+  bucket_name = "tops-cert-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
+
   tags = local.tags
 }
 
