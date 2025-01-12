@@ -1,6 +1,6 @@
 module "token_refresh_ecr" {
   source          = "./modules/ecr"
-  repository_name = "tops-token-refresh-${var.environment}"
+  repository_name = "tops-token-refresh${var.environment == "prod" ? "" : "-${var.environment}"}"
   tags = local.tags
 }
 
