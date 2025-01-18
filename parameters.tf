@@ -17,9 +17,9 @@ variable "sec_lab_token" {
 }
 
 locals {
-  app_base_path = "/tenantOps-${var.environment}/app-lab"
-  mcn_base_path = "/tenantOps-${var.environment}/mcn-lab"
-  sec_base_path = "/tenantOps-${var.environment}/sec-lab"
+  app_base_path = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/app-lab"
+  mcn_base_path = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab"
+  sec_base_path = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab"
 }
 
 module "app_lab_parameters" {

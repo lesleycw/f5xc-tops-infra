@@ -10,15 +10,17 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = var.environment_variables
   }
+  tags = var.tags
 }
 
 # Optional: CloudWatch Event Rule for Scheduled Trigger
 resource "aws_cloudwatch_event_rule" "schedule" {
   count = var.trigger_type == "schedule" ? 1 : 0
 
-  name        = "${var.function_name}-schedule"
-  description = "Trigger for Lambda function"
+  name                = "${var.function_name}-schedule"
+  description         = "Trigger for Lambda function"
   schedule_expression = var.schedule_expression
+  tags                = var.tags
 }
 
 resource "aws_cloudwatch_event_target" "lambda_schedule_target" {
@@ -47,6 +49,7 @@ resource "aws_lambda_event_source_mapping" "sqs" {
   function_name    = aws_lambda_function.lambda.arn
   batch_size       = var.sqs_batch_size
   enabled          = var.sqs_enabled
+  tags             = var.tags
 }
 
 # Variables
@@ -98,4 +101,10 @@ variable "sqs_enabled" {
   description = "Enable or disable the SQS trigger"
   type        = bool
   default     = true
+}
+
+variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
 }
