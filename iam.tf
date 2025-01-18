@@ -34,6 +34,15 @@ resource "aws_iam_policy" "lambda_execution_policy" {
         Effect = "Allow",
         Action = "ecr:GetAuthorizationToken",
         Resource = "*"
+      },
+      {
+      Effect = "Allow",
+      Action = [
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParametersByPath"
+      ],
+      Resource = "arn:aws:ssm:us-east-1:317124676658:parameter/*"
       }
     ]
   })
