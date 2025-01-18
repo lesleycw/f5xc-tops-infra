@@ -21,7 +21,7 @@ module "token_refresh_mcn_lambda" {
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
   ecr_repository_url    = module.token_refresh_ecr.repository_url
   environment_variables = {
-    "key" = "test"
+    "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab"
   }
   trigger_type          = "schedule"
   schedule_expression   = "rate(1 day)"
