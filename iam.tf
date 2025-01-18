@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "tops-lambda-execution-role-${var.environment}"
+  name = "tops-lambda-execution-role${var.environment == "prod" ? "" : "-${var.environment}"}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -16,7 +16,7 @@ resource "aws_iam_role" "lambda_execution_role" {
 }
 
 resource "aws_iam_policy" "lambda_execution_policy" {
-  name = "tops-lambda-execution-policy-${var.environment}"
+  name = "tops-lambda-execution-policy${var.environment == "prod" ? "" : "-${var.environment}"}"
 
   policy = jsonencode({
     Version = "2012-10-17",

@@ -20,7 +20,6 @@ resource "aws_cloudwatch_event_rule" "schedule" {
   name                = "${var.function_name}-schedule"
   description         = "Trigger for Lambda function"
   schedule_expression = var.schedule_expression
-  tags                = var.tags
 }
 
 resource "aws_cloudwatch_event_target" "lambda_schedule_target" {
