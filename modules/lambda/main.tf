@@ -49,7 +49,6 @@ resource "aws_lambda_event_source_mapping" "sqs" {
   function_name    = aws_lambda_function.lambda.arn
   batch_size       = var.sqs_batch_size
   enabled          = var.sqs_enabled
-  tags             = var.tags
 }
 
 # Variables
