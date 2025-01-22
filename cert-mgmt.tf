@@ -8,6 +8,7 @@ module "cert_bucket" {
 module "cert_mgmt_ecr" {
   source          = "./modules/ecr"
   repository_name = "tops-cert-mgmt${var.environment == "prod" ? "" : "-${var.environment}"}"
+  force_delete    = true
   tags = local.tags
 }
 
@@ -28,6 +29,7 @@ module "cert_mgmt_mcn_lambda" {
 module "acme_client_ecr" {
   source          = "./modules/ecr"
   repository_name = "tops-acme-client${var.environment == "prod" ? "" : "-${var.environment}"}"
+  force_delete    = true
   tags = local.tags
 }
 
