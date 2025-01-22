@@ -56,11 +56,22 @@ output "cert_bucket_arn" {
 }
 
 output "cert_ecr_url" {
-  description = "The URL of the ECR repository"
-  value       = module.cert_ecr.repository_url
+  description = "The URL of the cert_mgmt ECR repository"
+  value       = module.cert_mgmt_ecr.repository_url
 }
 
 output "cert_ecr_arn" {
-  description = "The ARN of the ECR repository"
-  value       = module.cert_ecr.repository_arn
+  description = "The ARN of the cert_mgmt ECR repository"
+  value       = module.cert_mgmt_ecr.repository_arn
+}
+
+output "acme_ecr_url" {
+  description = "The URL of the acme_client ECR repository"
+  value       = module.acme_client_ecr.repository_url
+}
+
+output "acme_ecr_arn" {
+  description = "The ARN of the acme_client ECR repository"
+  value       = module.acme_client_ecr.repository_arn
+  
 }
