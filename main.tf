@@ -37,3 +37,15 @@ variable "environment" {
   type        = string
   default     = ""
 }
+
+variable "acme_email" {
+  description = "The email address to use for ACME registration"
+  type        = string
+  default     = ""
+}
+
+variable "mcn_wildcard_domain" {
+  description = "The wildcard domain to use for the MCN lab tenant"
+  type        = string
+  default     = ""
+}
