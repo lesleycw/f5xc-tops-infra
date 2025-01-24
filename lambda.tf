@@ -52,3 +52,10 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = aws_iam_policy.lambda_execution_policy.arn
 }
+
+module "lambda_bucket" {
+  source      = "./modules/bucket"
+  bucket_name = "tops-lambda-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
+
+  tags = local.tags
+}
