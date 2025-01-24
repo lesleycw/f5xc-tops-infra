@@ -49,3 +49,10 @@ variable "mcn_wildcard_domain" {
   type        = string
   default     = ""
 }
+
+module "lambda_bucket" {
+  source      = "./modules/bucket"
+  bucket_name = "tops-lambda-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
+
+  tags = local.tags
+}
