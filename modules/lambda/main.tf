@@ -1,15 +1,18 @@
 resource "aws_lambda_function" "lambda" {
   function_name = var.function_name
   role          = var.lambda_role_arn
-  package_type  = "Image"
-
-  image_uri = "${var.ecr_repository_url}:${var.image_tag}"
+  runtime       = var.runtime
+  handler       = var.handler
+  s3_bucket     = var.s3_bucket
+  s3_key        = var.s3_key
 
   timeout      = var.timeout
   memory_size  = var.memory_size
+
   environment {
     variables = var.environment_variables
   }
+
   tags = var.tags
 }
 
@@ -51,21 +54,54 @@ resource "aws_lambda_event_source_mapping" "sqs" {
 }
 
 # Variables
-variable "function_name" {}
-variable "lambda_role_arn" {}
-variable "ecr_repository_url" {}
-variable "image_tag" {
-  default = "latest"
+variable "function_name" {
+  description = "The name of the Lambda function"
+  type        = string
 }
+
+variable "lambda_role_arn" {
+  description = "The IAM role ARN for the Lambda function"
+  type        = string
+}
+
+variable "s3_bucket" {
+  description = "The S3 bucket containing the Lambda ZIP package"
+  type        = string
+}
+
+variable "s3_key" {
+  description = "The S3 key of the Lambda ZIP package"
+  type        = string
+}
+
+variable "runtime" {
+  description = "The runtime for the Lambda function (e.g., python3.11)"
+  type        = string
+  default     = "python3.11"
+}
+
+variable "handler" {
+  description = "The handler for the Lambda function (e.g., function.lambda_handler)"
+  type        = string
+  default     = "function.lambda_handler"
+}
+
 variable "timeout" {
-  default = 60
+  description = "The timeout for the Lambda function (in seconds)"
+  type        = number
+  default     = 60
 }
+
 variable "memory_size" {
-  default = 128
+  description = "The amount of memory allocated to the Lambda function (in MB)"
+  type        = number
+  default     = 128
 }
+
 variable "environment_variables" {
-  type = map(string)
-  default = {}
+  description = "Environment variables for the Lambda function"
+  type        = map(string)
+  default     = {}
 }
 
 # Trigger Configuration
