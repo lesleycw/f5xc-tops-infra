@@ -37,7 +37,8 @@ module "acme_client_mcn_lambda" {
   source                = "./modules/lambda"
   function_name         = "tops-acme-client-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
-  ecr_repository_url    = module.acme_client_ecr.repository_url
+  s3_bucket             = module.lambda_bucket.bucket_name
+  s3_key                = "lambda/acme_client${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
   environment_variables = {
     "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
     "DOMAIN"        = "*.mcn-lab.f5demos.com",
