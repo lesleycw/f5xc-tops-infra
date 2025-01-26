@@ -5,12 +5,14 @@ module "cert_bucket" {
   tags = local.tags
 }
 
+/*
 module "cert_mgmt_ecr" {
   source          = "./modules/ecr"
   repository_name = "tops-cert-mgmt${var.environment == "prod" ? "" : "-${var.environment}"}"
   force_delete    = true
   tags = local.tags
 }
+*/
 
 module "cert_mgmt_mcn_lambda" {
   source                = "./modules/lambda"
@@ -27,12 +29,14 @@ module "cert_mgmt_mcn_lambda" {
   tags                  = local.tags
 }
 
+/*
 module "acme_client_ecr" {
   source          = "./modules/ecr"
   repository_name = "tops-acme-client${var.environment == "prod" ? "" : "-${var.environment}"}"
   force_delete    = true
   tags = local.tags
 }
+*/
 
 module "acme_client_mcn_lambda" {
   source                = "./modules/lambda"
@@ -59,6 +63,7 @@ output "cert_bucket_arn" {
   value = module.cert_bucket.bucket_arn
 }
 
+/*
 output "cert_ecr_url" {
   description = "The URL of the cert_mgmt ECR repository"
   value       = module.cert_mgmt_ecr.repository_url
@@ -79,3 +84,4 @@ output "acme_ecr_arn" {
   value       = module.acme_client_ecr.repository_arn
   
 }
+*/
