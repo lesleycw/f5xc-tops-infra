@@ -59,3 +59,11 @@ module "lambda_bucket" {
 
   tags = local.tags
 }
+
+output "lambda_bucket_name" {
+  value = module.lambda_bucket.bucket_name
+}
+
+output "lambda_bucket_arn" {
+  value = module.lambda_bucket.bucket_arn
+}
