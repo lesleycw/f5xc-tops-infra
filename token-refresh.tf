@@ -22,7 +22,7 @@ module "token_refresh_mcn_lambda" {
   function_name         = "tops-token-refresh-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
   s3_bucket             = module.lambda_bucket.bucket_name
-  s3_key                = "lambda/token_refresh${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+  s3_key                = "token_refresh${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
   runtime               = "python3.11"
   handler               = "function.lambda_handler"
   environment_variables = {

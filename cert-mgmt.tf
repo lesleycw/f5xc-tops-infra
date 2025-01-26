@@ -19,7 +19,7 @@ module "cert_mgmt_mcn_lambda" {
   function_name         = "tops-cert-mgmt-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
   s3_bucket             = module.lambda_bucket.bucket_name
-  s3_key                = "lambda/cert_mgmt${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+  s3_key                = "cert_mgmt${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
   environment_variables = {
     "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab",
     "S3_BUCKET"     = module.cert_bucket.bucket_name,
@@ -43,7 +43,7 @@ module "acme_client_mcn_lambda" {
   function_name         = "tops-acme-client-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
   s3_bucket             = module.lambda_bucket.bucket_name
-  s3_key                = "lambda/acme_client${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+  s3_key                = "acme_client${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
   environment_variables = {
     "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
     "DOMAIN"        = "*.mcn-lab.f5demos.com",
