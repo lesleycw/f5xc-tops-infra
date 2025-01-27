@@ -36,13 +36,25 @@ resource "aws_iam_policy" "lambda_execution_policy" {
         Resource = "*"
       },
       {
-      Effect = "Allow",
-      Action = [
-        "ssm:GetParameter",
-        "ssm:GetParameters",
-        "ssm:GetParametersByPath"
-      ],
-      Resource = "arn:aws:ssm:us-east-1:317124676658:parameter/*"
+        Effect = "Allow",
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
+        ],
+        Resource = "arn:aws:ssm:us-east-1:317124676658:parameter/*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          module.cert_bucket.bucket_arn,
+          "${module.cert_bucket.bucket_arn}/*"
+        ]
       }
     ]
   })
