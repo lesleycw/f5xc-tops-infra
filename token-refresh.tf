@@ -16,7 +16,7 @@ module "token_refresh_mcn_lambda" {
     "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab"
   }
   trigger_type          = "schedule"
-  schedule_expression   = "rate(1 day)"
+  schedule_expression   = "cron(0 1 * * ? *)"
   tags                  = local.tags
 }
 
@@ -33,7 +33,7 @@ module "token_refresh_sec_lambda" {
     "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab"
   }
   trigger_type          = "schedule"
-  schedule_expression   = "rate(1 day)"
+  schedule_expression   = "cron(0 1 * * ? *)"
   tags                  = local.tags
 }
 
@@ -50,6 +50,6 @@ module "token_refresh_app_lambda" {
     "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/app-lab"
   }
   trigger_type          = "schedule"
-  schedule_expression   = "rate(1 day)"
+  schedule_expression   = "cron(0 1 * * ? *)"
   tags                  = local.tags
 }
