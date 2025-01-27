@@ -1,10 +1,11 @@
 resource "aws_lambda_function" "lambda" {
-  function_name = var.function_name
-  role          = var.lambda_role_arn
-  runtime       = var.runtime
-  handler       = var.handler
-  s3_bucket     = var.s3_bucket
-  s3_key        = var.s3_key
+  function_name     = var.function_name
+  role              = var.lambda_role_arn
+  runtime           = var.runtime
+  handler           = var.handler
+  s3_bucket         = var.s3_bucket
+  s3_key            = var.s3_key
+  source_code_hash  = var.source_code_hash
 
   timeout      = var.timeout
   memory_size  = var.memory_size
@@ -71,6 +72,11 @@ variable "s3_bucket" {
 
 variable "s3_key" {
   description = "The S3 key of the Lambda ZIP package"
+  type        = string
+}
+
+variable "source_code_hash" {
+  description = "The base64-encoded SHA256 hash of the Lambda ZIP package"
   type        = string
 }
 
