@@ -40,7 +40,7 @@ module "acme_client_mcn_lambda" {
   source_code_hash      = data.aws_s3_object.acme_client_zip.etag
   environment_variables = {
     "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
-    "DOMAIN"        = "*.mcn-lab.f5demos.com",
+    "DOMAIN"        = "mcn-lab.f5demos.com",
     "S3_BUCKET"     = module.cert_bucket.bucket_name,
     "EMAIL"         = var.acme_email
   }
