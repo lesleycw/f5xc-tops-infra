@@ -61,11 +61,19 @@ resource "aws_iam_policy" "lambda_execution_policy" {
         Action = [
           "route53:ChangeResourceRecordSets",
           "route53:GetChange",
-          "route53:ListResourceRecordSets",
-          "route53:ListHostedZones"
+          "route53:ListResourceRecordSets"
         ],
         Resource = [
           "arn:aws:route53:::hostedzone/${var.zone_id}"
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "route53:ListHostedZones"
+        ],
+        Resource = [
+          "*"
         ]
       }
     ]
