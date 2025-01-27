@@ -14,9 +14,9 @@ module "cert_mgmt_mcn_lambda" {
   source                = "./modules/lambda"
   function_name         = "tops-cert-mgmt-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
-  s3_bucket             = data.aws_s3_bucket_object.cert_mgmt_zip.bucket
-  s3_key                = data.aws_s3_bucket_object.cert_mgmt_zip.key
-  source_code_hash      = data.aws_s3_bucket_object.cert_mgmt_zip.etag
+  s3_bucket             = data.aws_s3_object.cert_mgmt_zip.bucket
+  s3_key                = data.aws_s3_object.cert_mgmt_zip.key
+  source_code_hash      = data.aws_s3_object.cert_mgmt_zip.etag
   environment_variables = {
     "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab",
     "S3_BUCKET"     = module.cert_bucket.bucket_name,
@@ -35,9 +35,9 @@ module "acme_client_mcn_lambda" {
   source                = "./modules/lambda"
   function_name         = "tops-acme-client-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
-  s3_bucket             = data.aws_s3_bucket_object.acme_client_zip.bucket
-  s3_key                = data.aws_s3_bucket_object.acme_client_zip.key
-  source_code_hash      = data.aws_s3_bucket_object.acme_client_zip.etag
+  s3_bucket             = data.aws_s3_object.acme_client_zip.bucket
+  s3_key                = data.aws_s3_object.acme_client_zip.key
+  source_code_hash      = data.aws_s3_object.acme_client_zip.etag
   environment_variables = {
     "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
     "DOMAIN"        = "*.mcn-lab.f5demos.com",
