@@ -60,7 +60,6 @@ resource "aws_iam_policy" "lambda_execution_policy" {
         Effect = "Allow",
         Action = [
           "route53:ChangeResourceRecordSets",
-          "route53:GetChange",
           "route53:ListResourceRecordSets"
         ],
         Resource = [
@@ -70,7 +69,8 @@ resource "aws_iam_policy" "lambda_execution_policy" {
       {
         Effect = "Allow",
         Action = [
-          "route53:ListHostedZones"
+          "route53:ListHostedZones",
+          "route53:GetChange"
         ],
         Resource = [
           "*"
