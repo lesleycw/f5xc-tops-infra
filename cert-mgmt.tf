@@ -23,7 +23,7 @@ module "cert_mgmt_mcn_lambda" {
     "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
   }
   trigger_type          = "schedule"
-  schedule_expression   = "rate(1 day)"
+  schedule_expression = "cron(0 12 * * ? *)"
   tags                  = local.tags
 }
 
@@ -46,7 +46,7 @@ module "acme_client_mcn_lambda" {
     "EMAIL"         = var.acme_email
   }
   trigger_type          = "schedule"
-  schedule_expression   = "rate(1 day)"
+  schedule_expression   = "cron(0 0 * * ? *)"
   tags                  = local.tags
 }
 
