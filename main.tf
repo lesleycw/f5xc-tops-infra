@@ -35,23 +35,14 @@ variable "aws_region" {
 variable "environment" {
   description = "The branch name or workspace name to suffix resource names"
   type        = string
-  default     = ""
 }
 
 variable "acme_email" {
   description = "The email address to use for ACME registration"
   type        = string
-  default     = ""
-}
-
-variable "mcn_wildcard_domain" {
-  description = "The wildcard domain to use for the MCN lab tenant"
-  type        = string
-  default     = ""
 }
 
 variable "zone_id" {
   description = "The Route 53 zone ID for the wildcard domain"
   type        = string
-  default     = ""
 }
