@@ -55,6 +55,18 @@ resource "aws_iam_policy" "lambda_execution_policy" {
           module.cert_bucket.bucket_arn,
           "${module.cert_bucket.bucket_arn}/*"
         ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "route53:ChangeResourceRecordSets",
+          "route53:GetChange",
+          "route53:ListResourceRecordSets",
+          "route53:ListHostedZones"
+        ],
+        Resource = [
+          "arn:aws:route53:::hostedzone/${var.zone_id}"
+        ]
       }
     ]
   })

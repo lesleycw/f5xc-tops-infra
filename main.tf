@@ -49,3 +49,9 @@ variable "mcn_wildcard_domain" {
   type        = string
   default     = ""
 }
+
+variable "zone_id" {
+  description = "The Route 53 zone ID for the wildcard domain"
+  type        = string
+  default     = ""
+}
