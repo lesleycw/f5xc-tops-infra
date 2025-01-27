@@ -20,6 +20,7 @@ module "cert_mgmt_mcn_lambda" {
   environment_variables = {
     "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab",
     "S3_BUCKET"     = module.cert_bucket.bucket_name,
+    "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
   }
   trigger_type          = "schedule"
   schedule_expression   = "rate(1 day)"
@@ -40,7 +41,7 @@ module "acme_client_mcn_lambda" {
   source_code_hash      = data.aws_s3_object.acme_client_zip.etag
   environment_variables = {
     "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
-    "DOMAIN"        = "mcn-lab.f5demos.com",
+    "DOMAIN"        = "mcn-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
     "S3_BUCKET"     = module.cert_bucket.bucket_name,
     "EMAIL"         = var.acme_email
   }
