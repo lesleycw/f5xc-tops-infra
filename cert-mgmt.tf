@@ -2,19 +2,23 @@
 S3 Bucket to store all generated certificates
 */
 
-module "cert_bucket" {
-  source      = "./modules/bucket"
-  bucket_name = "tops-cert-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
+resource "aws_s3_bucket" "cert_bucket" {
+  bucket        = "tops-cert-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
+  force_destroy = true
+
+  lifecycle {
+    prevent_destroy = false
+  }
 
   tags = local.tags
 }
 
 output "cert_bucket_name" {
-  value = module.cert_bucket.bucket_name
+  value = aws_s3_bucket.cert_bucket.bucket
 }
 
 output "cert_bucket_arn" {
-  value = module.cert_bucket.bucket_arn
+  value = aws_s3_bucket.cert_bucket.arn
 }
 
 /*
@@ -22,8 +26,25 @@ Lambda function to manage certificates in tenants
 */
 
 data "aws_s3_object" "cert_mgmt_zip" {
-  bucket = module.lambda_bucket.bucket_name
+  bucket = aws_s3_bucket.lambda_bucket.bucket
   key    = "cert_mgmt${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+}
+
+resource "aws_iam_role" "cert_mgmt_lambda_role" {
+  name = "tops-cert-mgmt-role${var.environment == "prod" ? "" : "-${var.environment}"}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_policy" "cert_mgmt_lambda_policy" {
@@ -41,7 +62,7 @@ resource "aws_iam_policy" "cert_mgmt_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = ["s3:GetObject", "s3:PutObject"],
-        Resource = "arn:aws:s3:::${module.cert_bucket.bucket_name}/*"
+        Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
       {
         Effect = "Allow",
@@ -56,21 +77,32 @@ resource "aws_iam_policy" "cert_mgmt_lambda_policy" {
   })
 }
 
-module "cert_mgmt_mcn_lambda" {
-  source                = "./modules/lambda"
-  function_name         = "tops-cert-mgmt-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
-  lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
-  lambda_policy_arn     = aws_iam_policy.cert_mgmt_lambda_policy.arn
-  s3_bucket             = data.aws_s3_object.cert_mgmt_zip.bucket
-  s3_key                = data.aws_s3_object.cert_mgmt_zip.key
-  source_code_hash      = data.aws_s3_object.cert_mgmt_zip.etag
-  environment_variables = {
-    "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab",
-    "S3_BUCKET"     = module.cert_bucket.bucket_name,
-    "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
+resource "aws_iam_role_policy_attachment" "cert_mgmt_lambda_attach" {
+  role       = aws_iam_role.cert_mgmt_lambda_role.name
+  policy_arn = aws_iam_policy.cert_mgmt_lambda_policy.arn
+}
+
+resource "aws_lambda_function" "cert_mgmt_mcn_lambda" {
+  function_name    = "tops-cert-mgmt-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.cert_mgmt_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.cert_mgmt_zip.bucket
+  s3_key           = data.aws_s3_object.cert_mgmt_zip.key
+  source_code_hash = data.aws_s3_object.cert_mgmt_zip.etag
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  environment {
+    variables = {
+      "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab"
+      "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket
+      "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
+    }
   }
-  schedule_expression   = "cron(0 12 * * ? *)"
-  tags                  = local.tags
+
+  tags = local.tags
 }
 
 /*
@@ -78,8 +110,25 @@ Lambda function to act as ACME client to create/update certs
 */
 
 data "aws_s3_object" "acme_client_zip" {
-  bucket = module.lambda_bucket.bucket_name
+  bucket = aws_s3_bucket.lambda_bucket.bucket
   key    = "acme_client${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+}
+
+resource "aws_iam_role" "acme_client_lambda_role" {
+  name = "tops-acme-client-role${var.environment == "prod" ? "" : "-${var.environment}"}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_policy" "acme_client_lambda_policy" {
@@ -97,7 +146,7 @@ resource "aws_iam_policy" "acme_client_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = ["s3:GetObject", "s3:PutObject"],
-        Resource = "arn:aws:s3:::${module.cert_bucket.bucket_name}/*"
+        Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
       {
         Effect = "Allow",
@@ -132,20 +181,31 @@ resource "aws_iam_policy" "acme_client_lambda_policy" {
   })
 }
 
-module "acme_client_mcn_lambda" {
-  source                = "./modules/lambda"
-  function_name         = "tops-acme-client-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
-  lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
-  lambda_policy_arn     = aws_iam_policy.acme_client_lambda_policy.arn
-  s3_bucket             = data.aws_s3_object.acme_client_zip.bucket
-  s3_key                = data.aws_s3_object.acme_client_zip.key
-  source_code_hash      = data.aws_s3_object.acme_client_zip.etag
-  environment_variables = {
-    "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
-    "DOMAIN"        = "mcn-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
-    "S3_BUCKET"     = module.cert_bucket.bucket_name,
-    "EMAIL"         = var.acme_email
+resource "aws_iam_role_policy_attachment" "acme_client_lambda_attach" {
+  role       = aws_iam_role.acme_client_lambda_role.name
+  policy_arn = aws_iam_policy.acme_client_lambda_policy.arn
+}
+
+resource "aws_lambda_function" "acme_client_mcn_lambda" {
+  function_name    = "tops-acme-client-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.acme_client_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.acme_client_zip.bucket
+  s3_key           = data.aws_s3_object.acme_client_zip.key
+  source_code_hash = data.aws_s3_object.acme_client_zip.etag
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  environment {
+    variables = {
+      "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
+      "DOMAIN"        = "mcn-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
+      "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket,
+      "EMAIL"         = var.acme_email
+    }
   }
-  schedule_expression   = "cron(0 0 * * ? *)" # Set up the scheduled trigger
-  tags                  = local.tags
+
+  tags = local.tags
 }

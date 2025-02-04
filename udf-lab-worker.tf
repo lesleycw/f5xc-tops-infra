@@ -1,3 +1,6 @@
+/*
+UDF Worker Lambda
+*/
 resource "aws_dynamodb_table" "lab_deployment_state" {
   name         = "tops-lab-deployment-state${var.environment == "prod" ? "" : "-${var.environment}"}"
   billing_mode = "PAY_PER_REQUEST"
@@ -27,8 +30,25 @@ resource "aws_sqs_queue" "udf_worker_queue" {
 
 
 data "aws_s3_object" "udf_worker_zip" {
-  bucket = module.lambda_bucket.bucket_name
+  bucket = aws_s3_bucket.lambda_bucket.bucket
   key    = "udf_worker${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+}
+
+resource "aws_iam_role" "udf_worker_lambda_role" {
+  name = "tops-udf-worker-role${var.environment == "prod" ? "" : "-${var.environment}"}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_policy" "udf_worker_lambda_policy" {
@@ -59,35 +79,67 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
         Resource = [
           "arn:aws:lambda:*:*:function:tops-user-create*",
           "arn:aws:lambda:*:*:function:tops-ns-create*",
-          "arn:aws:lambda:*:*:function:tops-lab-runner*",
+          "arn:aws:lambda:*:*:function:tops-lab-runner*"
         ]
       }
     ]
   })
 }
 
-module "udf_worker_lambda" {
-  source                = "./modules/lambda"
-  function_name         = "tops-udf-worker${var.environment == "prod" ? "" : "-${var.environment}"}"
-  lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
-  lambda_policy_arn     = aws_iam_policy.udf_worker_lambda_policy.arn
-  s3_bucket             = data.aws_s3_object.udf_worker_zip.bucket
-  s3_key                = data.aws_s3_object.udf_worker_zip.key
-  source_code_hash      = data.aws_s3_object.udf_worker_zip.etag
-  runtime               = "python3.11"
-  handler               = "function.lambda_handler"
-  sqs_queue_arn         = aws_sqs_queue.udf_worker_queue.arn
-  sqs_batch_size        = 1
-  tags                  = local.tags
+resource "aws_iam_role_policy_attachment" "udf_worker_lambda_attach" {
+  role       = aws_iam_role.udf_worker_lambda_role.name
+  policy_arn = aws_iam_policy.udf_worker_lambda_policy.arn
 }
 
+resource "aws_lambda_function" "udf_worker_lambda" {
+  function_name    = "tops-udf-worker${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.udf_cleanup_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.udf_worker_zip.bucket
+  s3_key           = data.aws_s3_object.udf_worker_zip.key
+  source_code_hash = data.aws_s3_object.udf_worker_zip.etag
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  tags = local.tags
+}
+
+resource "aws_lambda_event_source_mapping" "udf_worker_sqs_trigger" {
+  function_name    = aws_lambda_function.udf_worker_lambda.arn
+  event_source_arn = aws_sqs_queue.udf_worker_queue.arn
+  batch_size       = 1
+  enabled          = true
+}
+
+/*
+UDF Cleanup Lambda
+*/
+
 data "aws_s3_object" "udf_cleanup_zip" {
-  bucket = module.lambda_bucket.bucket_name
+  bucket = aws_s3_bucket.lambda_bucket.bucket
   key    = "udf_cleanup${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
 }
 
+resource "aws_iam_role" "udf_cleanup_lambda_role" {
+  name = "tops-udf-cleanup-role${var.environment == "prod" ? "" : "-${var.environment}"}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
 resource "aws_iam_policy" "udf_cleanup_lambda_policy" {
-  name        = "CleanupLambdaPolicy"
+  name        = "cleanup_lambda_policy${var.environment == "prod" ? "" : "-${var.environment}"}"
   description = "Allows Lambda to read from DynamoDB streams and invoke other Lambdas"
 
   policy = jsonencode({
@@ -120,23 +172,36 @@ resource "aws_iam_policy" "udf_cleanup_lambda_policy" {
         Effect   = "Allow",
         Action   = ["logs:CreateLogStream", "logs:PutLogEvents"],
         Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-udf-cleanup*"
-      },
+      }
     ]
   })
 }
 
-module "udf_cleanup_lambda" {
-  source                = "./modules/lambda"
-  function_name         = "tops-udf-cleanup${var.environment == "prod" ? "" : "-${var.environment}"}"
-  lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
-  lambda_policy_arn     = aws_iam_policy.udf_cleanup_lambda_policy.arn
-  s3_bucket             = data.aws_s3_object.udf_cleanup_zip.bucket
-  s3_key                = data.aws_s3_object.udf_cleanup_zip.key
-  source_code_hash      = data.aws_s3_object.udf_cleanup_zip.etag
-  runtime               = "python3.11"
-  handler               = "function.lambda_handler"
-  dynamodb_stream_arn   = aws_dynamodb_table.lab_deployment_state.stream_arn
-  tags                  = local.tags
+resource "aws_iam_role_policy_attachment" "udf_cleanup_lambda_attach" {
+  role       = aws_iam_role.udf_cleanup_lambda_role.name  
+  policy_arn = aws_iam_policy.udf_cleanup_lambda_policy.arn
+}
+
+resource "aws_lambda_function" "udf_cleanup_lambda" {
+  function_name    = "tops-udf-cleanup${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.udf_cleanup_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.udf_cleanup_zip.bucket
+  s3_key           = data.aws_s3_object.udf_cleanup_zip.key
+  source_code_hash = data.aws_s3_object.udf_cleanup_zip.etag
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  tags = local.tags
+}
+
+resource "aws_lambda_event_source_mapping" "udf_cleanup_dynamodb_trigger" {
+  function_name     = aws_lambda_function.udf_cleanup_lambda.arn
+  event_source_arn  = aws_dynamodb_table.lab_deployment_state.stream_arn
+  starting_position = "LATEST"
+  enabled           = true
 }
 
 

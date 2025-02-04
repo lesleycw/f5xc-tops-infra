@@ -46,9 +46,13 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
-module "lambda_bucket" {
-  source      = "./modules/bucket"
-  bucket_name = "tops-lambda-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
+resource "aws_s3_bucket" "lambda_bucket" {
+  bucket        = "tops-lambda-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
+  force_destroy = true
+
+  lifecycle {
+    prevent_destroy = false
+  }
 
   tags = local.tags
 }
@@ -66,6 +70,18 @@ variable "aws_region" {
 variable "environment" {
   description = "The branch name or workspace name to suffix resource names"
   type        = string
+}
+
+variable "lambda_timeout" {
+  description = "The timeout for the Lambda function (in seconds)"
+  type        = number
+  default     = 60
+}
+
+variable "lambda_memory_size" {
+  description = "The memory allocated to the Lambda function (in MB)"
+  type        = number
+  default     = 128
 }
 
 variable "acme_email" {
