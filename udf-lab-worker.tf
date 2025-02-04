@@ -56,10 +56,11 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = ["lambda:InvokeFunction"],
-        Resource = compact([
-          try(module.user_create_lambda[0].function_arn, null),
-          try(module.ns_create_lambda[0].function_arn, null)
-        ])
+        Resource = [
+          "arn:aws:lambda:*:*:function:tops-user-create*",
+          "arn:aws:lambda:*:*:function:tops-ns-create*",
+          "arn:aws:lambda:*:*:function:tops-lab-runner*",
+        ]
       }
     ]
   })
@@ -111,10 +112,10 @@ resource "aws_iam_policy" "udf_cleanup_lambda_policy" {
       },
       {
         Effect   = "Allow",
-        Action   = "lambda:InvokeFunction",
+        Action   = ["lambda:InvokeFunction"],
         Resource = [
-          module.user_delete_lambda.function_arn,
-          module.ns_remove_lambda.function_arn
+          "arn:aws:lambda:*:*:function:tops-user-remove*",
+          "arn:aws:lambda:*:*:function:tops-ns-remove*"
         ]
       },
       {
