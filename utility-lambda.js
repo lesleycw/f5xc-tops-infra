@@ -29,7 +29,6 @@ data "aws_s3_object" "user_create_zip" {
 }
 
 module "user_create_lambda" {
-    count                = length(data.aws_s3_object.user_create_zip.id) > 0 ? 1 : 0
     source                = "./modules/lambda"
     function_name         = "tops-user-create${var.environment == "prod" ? "" : "-${var.environment}"}"
     lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
@@ -48,7 +47,6 @@ data "aws_s3_object" "user_remove_zip" {
 }
 
 module "user_remove_lambda" {
-    count                = length(data.aws_s3_object.user_remove_zip.id) > 0 ? 1 : 0
     source                = "./modules/lambda"
     function_name         = "tops-user-remove${var.environment == "prod" ? "" : "-${var.environment}"}"
     lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
@@ -67,7 +65,6 @@ data "aws_s3_object" "ns_create_zip" {
 }
 
 module "ns_create_lambda" {
-    count                = length(data.aws_s3_object.ns_create_zip.id) > 0 ? 1 : 0
     source                = "./modules/lambda"
     function_name         = "tops-user-remove${var.environment == "prod" ? "" : "-${var.environment}"}"
     lambda_role_arn       = aws_iam_role.lambda_execution_role.arn

@@ -67,7 +67,6 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
 }
 
 module "udf_worker_lambda" {
-  count                = length(data.aws_s3_object.udf_worker_zip.id) > 0 ? 1 : 0
   source                = "./modules/lambda"
   function_name         = "tops-udf-worker${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
@@ -127,7 +126,6 @@ resource "aws_iam_policy" "udf_cleanup_lambda_policy" {
 }
 
 module "udf_cleanup_lambda" {
-  count                = length(data.aws_s3_object.udf_cleanup_zip.id) > 0 ? 1 : 0
   source                = "./modules/lambda"
   function_name         = "tops-udf-cleanup${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
