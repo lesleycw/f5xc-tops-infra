@@ -1,4 +1,3 @@
-# Lambda Function
 resource "aws_lambda_function" "lambda" {
   function_name     = var.function_name
   role              = var.lambda_role_arn
@@ -18,15 +17,9 @@ resource "aws_lambda_function" "lambda" {
   tags = var.tags
 }
 
-# Attach the provided policy to the provided IAM role
-resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
-  role       = var.lambda_role_arn
-  policy_arn = var.lambda_policy_arn
-}
-
 # Optional: CloudWatch Event Rule for Scheduled Trigger
 resource "aws_cloudwatch_event_rule" "schedule" {
-  count = var.schedule_expression != "" ? 1 : 0
+  count = var.trigger_type == "schedule" ? 1 : 0
 
   name                = "${var.function_name}-schedule"
   description         = "Trigger for Lambda function"
@@ -34,7 +27,7 @@ resource "aws_cloudwatch_event_rule" "schedule" {
 }
 
 resource "aws_cloudwatch_event_target" "lambda_schedule_target" {
-  count = var.schedule_expression != "" ? 1 : 0
+  count = var.trigger_type == "schedule" ? 1 : 0
 
   rule      = aws_cloudwatch_event_rule.schedule[count.index].name
   target_id = "lambda-target"
@@ -42,7 +35,7 @@ resource "aws_cloudwatch_event_target" "lambda_schedule_target" {
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch" {
-  count = var.schedule_expression != "" ? 1 : 0
+  count = var.trigger_type == "schedule" ? 1 : 0
 
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
@@ -53,21 +46,12 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
 
 # Optional: SQS Trigger
 resource "aws_lambda_event_source_mapping" "sqs" {
-  count = var.sqs_queue_arn != "" ? 1 : 0
+  count = var.trigger_type == "sqs" ? 1 : 0
 
   event_source_arn = var.sqs_queue_arn
   function_name    = aws_lambda_function.lambda.arn
   batch_size       = var.sqs_batch_size
   enabled          = var.sqs_enabled
-}
-
-# Optional: DynamoDB Stream Trigger
-resource "aws_lambda_event_source_mapping" "dynamodb_stream" {
-  count = var.dynamodb_stream_arn != "" ? 1 : 0
-
-  event_source_arn  = var.dynamodb_stream_arn
-  function_name     = aws_lambda_function.lambda.arn
-  starting_position = "LATEST"
 }
 
 # Variables
@@ -77,12 +61,7 @@ variable "function_name" {
 }
 
 variable "lambda_role_arn" {
-  description = "The IAM role ARN for the Lambda function (must be provided)"
-  type        = string
-}
-
-variable "lambda_policy_arn" {
-  description = "The IAM policy ARN to attach to the Lambda execution role (must be provided)"
+  description = "The IAM role ARN for the Lambda function"
   type        = string
 }
 
@@ -131,16 +110,23 @@ variable "environment_variables" {
   default     = {}
 }
 
+# Trigger Configuration
+variable "trigger_type" {
+  description = "Type of trigger for the Lambda function: 'schedule' or 'sqs'"
+  type        = string
+  default     = "schedule"
+}
+
 # Schedule-specific variables
 variable "schedule_expression" {
   description = "Schedule expression for CloudWatch Events (e.g., 'rate(1 day)')"
   type        = string
-  default     = ""
+  default     = "rate(1 day)"
 }
 
 # SQS-specific variables
 variable "sqs_queue_arn" {
-  description = "ARN of the SQS queue to trigger the Lambda function (optional)"
+  description = "ARN of the SQS queue to trigger the Lambda function"
   type        = string
   default     = ""
 }
@@ -157,20 +143,8 @@ variable "sqs_enabled" {
   default     = true
 }
 
-# DynamoDB-specific variables
-variable "dynamodb_stream_arn" {
-  description = "ARN of the DynamoDB Stream to trigger the Lambda function (optional)"
-  type        = string
-  default     = ""
-}
-
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)
   default     = {}
-}
-
-output "function_arn" {
-  description = "The ARN of the created Lambda function"
-  value       = aws_lambda_function.lambda.arn
 }
