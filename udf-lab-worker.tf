@@ -58,35 +58,33 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
-      # 🔹 Logs Permissions
+      # ✅ Allow Lambda to log
       {
         Effect   = "Allow",
         Action   = ["logs:CreateLogStream", "logs:PutLogEvents"],
         Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-udf-worker*"
       },
 
-      # 🔹 SQS Permissions
-      {
-        Effect   = "Allow",
-        Action   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
-        Resource = aws_sqs_queue.udf_worker_queue.arn
-      },
-
-      # 🔹 DynamoDB Permissions (Read & Write)
+      # ✅ Allow Lambda to receive and delete messages from SQS
       {
         Effect   = "Allow",
         Action   = [
-          "dynamodb:GetItem",       # Read state
-          "dynamodb:Query",         # Query for related items
-          "dynamodb:Scan",          # Scan entire table (if needed)
-          "dynamodb:PutItem",       # Create new state entries
-          "dynamodb:UpdateItem",    # Update state entries
-          "dynamodb:DeleteItem"     # Remove entries if needed
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl"
         ],
-        Resource = aws_dynamodb_table.lab_deployment_state.arn
+        Resource = aws_sqs_queue.udf_worker_queue.arn
       },
 
-      # 🔹 Lambda Invoke Permissions (to trigger other lambdas)
+      # ✅ Allow Lambda to interact with DynamoDB
+      {
+        Effect   = "Allow",
+        Action   = ["dynamodb:GetRecords", "dynamodb:PutItem", "dynamodb:UpdateItem"],
+        Resource = aws_dynamodb_table.lab_configuration.arn
+      },
+
+      # ✅ Allow Lambda to invoke other Lambda functions
       {
         Effect   = "Allow",
         Action   = ["lambda:InvokeFunction"],
