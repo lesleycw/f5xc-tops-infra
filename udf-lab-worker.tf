@@ -105,7 +105,7 @@ resource "aws_iam_role_policy_attachment" "udf_worker_lambda_attach" {
 
 resource "aws_lambda_function" "udf_worker_lambda" {
   function_name    = "tops-udf-worker${var.environment == "prod" ? "" : "-${var.environment}"}"
-  role             = aws_iam_role.udf_cleanup_lambda_role.arn
+  role             = aws_iam_role.udf_worker_lambda_role.arn
   runtime          = "python3.11"
   handler          = "function.lambda_handler"
   s3_bucket        = data.aws_s3_object.udf_worker_zip.bucket
