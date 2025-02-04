@@ -56,10 +56,10 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = ["lambda:InvokeFunction"],
-        Resource = [
-          module.user_create_lambda.function_arn,
-          module.ns_create_lambda.function_arn
-        ]
+        Resource = compact([
+          try(module.user_create_lambda[0].function_arn, null),
+          try(module.ns_create_lambda[0].function_arn, null)
+        ])
       }
     ]
   })

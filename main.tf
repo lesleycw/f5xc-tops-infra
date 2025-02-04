@@ -27,7 +27,7 @@ locals {
 }
 
 /*
-IAM Role for Lambda Execution across the project
+Common Lambda Resources 
 */
 resource "aws_iam_role" "lambda_execution_role" {
   name = "tops-lambda-execution-role${var.environment == "prod" ? "" : "-${var.environment}"}"
@@ -45,6 +45,17 @@ resource "aws_iam_role" "lambda_execution_role" {
     ]
   })
 }
+
+module "lambda_bucket" {
+  source      = "./modules/bucket"
+  bucket_name = "tops-lambda-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
+
+  tags = local.tags
+}
+
+/* 
+Vars 
+*/
 
 variable "aws_region" {
   description = "AWS region for the S3 bucket"
