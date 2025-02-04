@@ -32,7 +32,7 @@ resource "aws_iam_policy" "token_refresh_lambda_policy" {
 }
 
 module "token_refresh_mcn_lambda" {
-  count                 = try(length(data.aws_s3_object.token_refresh_zip.id), 0) > 0 ? 1 : 0
+  count                = length(data.aws_s3_object.token_refresh_zip.id) > 0 ? 1 : 0
   source                = "./modules/lambda"
   function_name         = "tops-token-refresh-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
@@ -50,7 +50,7 @@ module "token_refresh_mcn_lambda" {
 }
 
 module "token_refresh_sec_lambda" {
-  count                 = try(length(data.aws_s3_object.token_refresh_zip.id), 0) > 0 ? 1 : 0
+  count                = length(data.aws_s3_object.token_refresh_zip.id) > 0 ? 1 : 0
   source                = "./modules/lambda"
   function_name         = "tops-token-refresh-sec${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
@@ -68,7 +68,7 @@ module "token_refresh_sec_lambda" {
 }
 
 module "token_refresh_app_lambda" {
-  count                 = try(length(data.aws_s3_object.token_refresh_zip.id), 0) > 0 ? 1 : 0
+  count                = length(data.aws_s3_object.token_refresh_zip.id) > 0 ? 1 : 0
   source                = "./modules/lambda"
   function_name         = "tops-token-refresh-app${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
