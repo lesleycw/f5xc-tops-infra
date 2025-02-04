@@ -58,21 +58,35 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
+      # 🔹 Logs Permissions
       {
         Effect   = "Allow",
         Action   = ["logs:CreateLogStream", "logs:PutLogEvents"],
         Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-udf-worker*"
       },
+
+      # 🔹 SQS Permissions
       {
         Effect   = "Allow",
         Action   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
         Resource = aws_sqs_queue.udf_worker_queue.arn
       },
+
+      # 🔹 DynamoDB Permissions (Read & Write)
       {
         Effect   = "Allow",
-        Action   = "dynamodb:GetRecords",
-        Resource = aws_dynamodb_table.lab_configuration.arn
+        Action   = [
+          "dynamodb:GetItem",       # Read state
+          "dynamodb:Query",         # Query for related items
+          "dynamodb:Scan",          # Scan entire table (if needed)
+          "dynamodb:PutItem",       # Create new state entries
+          "dynamodb:UpdateItem",    # Update state entries
+          "dynamodb:DeleteItem"     # Remove entries if needed
+        ],
+        Resource = aws_dynamodb_table.lab_deployment_state.arn
       },
+
+      # 🔹 Lambda Invoke Permissions (to trigger other lambdas)
       {
         Effect   = "Allow",
         Action   = ["lambda:InvokeFunction"],

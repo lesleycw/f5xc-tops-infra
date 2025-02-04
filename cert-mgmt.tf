@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "cert_bucket" {
   force_destroy = true
 
   lifecycle {
-    prevent_destroy = false
+    prevent_destroy = true
   }
 
   tags = local.tags
