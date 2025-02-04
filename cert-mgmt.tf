@@ -57,7 +57,7 @@ resource "aws_iam_policy" "cert_mgmt_lambda_policy" {
 }
 
 module "cert_mgmt_mcn_lambda" {
-  count                 = length(data.aws_s3_object.cert_mgmt_zip.id) > 0 ? 1 : 0
+  count                 = try(length(data.aws_s3_object.cert_mgmt_zip.id), 0) > 0 ? 1 : 0
   source                = "./modules/lambda"
   function_name         = "tops-cert-mgmt-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
@@ -134,7 +134,7 @@ resource "aws_iam_policy" "acme_client_lambda_policy" {
 }
 
 module "acme_client_mcn_lambda" {
-  count                 = length(data.aws_s3_object.acme_client_zip.id) > 0 ? 1 : 0
+  count                 = try(length(data.aws_s3_object.acme_client_zip.id), 0) > 0 ? 1 : 0
   source                = "./modules/lambda"
   function_name         = "tops-acme-client-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   lambda_role_arn       = aws_iam_role.lambda_execution_role.arn
