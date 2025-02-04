@@ -22,10 +22,57 @@ resource "aws_dynamodb_table" "lab_deployment_state" {
 
 resource "aws_sqs_queue" "udf_worker_queue" {
   name                      = "tops-udf-worker-queue${var.environment == "prod" ? "" : "-${var.environment}"}"
-  message_retention_seconds = 86400
+  message_retention_seconds = 3600
   visibility_timeout_seconds = 60
   delay_seconds             = 0
   receive_wait_time_seconds = 10
+}
+
+resource "aws_sqs_queue_policy" "udf_worker_queue_policy" {
+  queue_url = aws_sqs_queue.udf_worker_queue.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "AllowLambdaToConsumeSQS",
+        Effect    = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        },
+        Action    = "sqs:ReceiveMessage",
+        Resource  = aws_sqs_queue.udf_worker_queue.arn
+      },
+      {
+        Sid       = "AllowUDFToSendSQS",
+        Effect    = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        },
+        Action    = "sqs:SendMessage",
+        Condition = {
+          "ForAnyValue:StringEquals": {
+            "aws:PrincipalOrgPaths": var.udf_principal_org_path
+          }
+        }
+        Resource  = aws_sqs_queue.udf_worker_queue.arn
+      },
+      {
+        Sid       = "AllowSQSManagementForAccount",
+        Effect    = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action    = [
+          "sqs:SendMessage",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ],
+        Resource  = aws_sqs_queue.udf_worker_queue.arn
+      }
+    ]
+  })
 }
 
 

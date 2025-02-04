@@ -26,6 +26,8 @@ locals {
     }
 }
 
+data "aws_caller_identity" "current" {}
+
 /*
 Common Lambda Resources 
 */
@@ -91,5 +93,10 @@ variable "acme_email" {
 
 variable "zone_id" {
   description = "The Route 53 zone ID for the wildcard domain"
+  type        = string
+}
+
+variable "udf_principal_org_path" {
+  description = "The principal org path for UDF"
   type        = string
 }
