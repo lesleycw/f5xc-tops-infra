@@ -55,23 +55,21 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
 # -------------------- SQS Trigger --------------------
 
 resource "aws_lambda_event_source_mapping" "sqs" {
-  count = var.sqs_queue_arn != null ? 1 : 0
-
   function_name    = aws_lambda_function.lambda.arn
   event_source_arn = var.sqs_queue_arn
   batch_size       = var.sqs_batch_size
-  enabled          = true
+  enabled          = var.sqs_queue_arn != null ? true : false
 }
 
 # -------------------- DynamoDB Stream Trigger --------------------
 
 resource "aws_lambda_event_source_mapping" "dynamodb_stream" {
-  count = var.dynamodb_stream_arn != null ? 1 : 0
-
   function_name     = aws_lambda_function.lambda.arn
   event_source_arn  = var.dynamodb_stream_arn
   starting_position = "LATEST"
-  enabled          = true
+  
+  # Enable only if the ARN is known
+  enabled = var.dynamodb_stream_arn != null ? true : false
 }
 
 # -------------------- Outputs --------------------
