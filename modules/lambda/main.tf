@@ -53,7 +53,7 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
 
 # Optional: SQS Trigger
 resource "aws_lambda_event_source_mapping" "sqs" {
-  count = var.sqs_queue_arn != "" ? 1 : 0
+  count = var.sqs_queue_arn != null ? 1 : 0
 
   event_source_arn = var.sqs_queue_arn
   function_name    = aws_lambda_function.lambda.arn
@@ -63,7 +63,7 @@ resource "aws_lambda_event_source_mapping" "sqs" {
 
 # Optional: DynamoDB Stream Trigger
 resource "aws_lambda_event_source_mapping" "dynamodb_stream" {
-  count = var.dynamodb_stream_arn != "" ? 1 : 0
+  count = var.dynamodb_stream_arn != null ? 1 : 0
 
   event_source_arn  = var.dynamodb_stream_arn
   function_name     = aws_lambda_function.lambda.arn
@@ -138,11 +138,10 @@ variable "schedule_expression" {
   default     = ""
 }
 
-# SQS-specific variables
 variable "sqs_queue_arn" {
   description = "ARN of the SQS queue to trigger the Lambda function (optional)"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "sqs_batch_size" {
@@ -157,11 +156,10 @@ variable "sqs_enabled" {
   default     = true
 }
 
-# DynamoDB-specific variables
 variable "dynamodb_stream_arn" {
   description = "ARN of the DynamoDB Stream to trigger the Lambda function (optional)"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "tags" {

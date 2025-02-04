@@ -79,7 +79,6 @@ module "udf_worker_lambda" {
   handler               = "function.lambda_handler"
   sqs_queue_arn         = aws_sqs_queue.udf_worker_queue.arn
   sqs_batch_size        = 1
-  sqs_enabled           = true
   tags                  = local.tags
 }
 
