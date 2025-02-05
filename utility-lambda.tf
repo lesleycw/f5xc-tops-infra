@@ -73,7 +73,7 @@ data "aws_s3_object" "user_remove_zip" {
 
 resource "aws_lambda_function" "user_remove_lambda" {
   function_name    = "tops-user-remove${var.environment == "prod" ? "" : "-${var.environment}"}"
-  role             = aws_iam_role.udf_cleanup_lambda_role.arn
+  role             = aws_iam_role.utility_lambda_role.arn
   runtime          = "python3.11"
   handler          = "function.lambda_handler"
   s3_bucket        = aws_s3_bucket.lambda_bucket.bucket
