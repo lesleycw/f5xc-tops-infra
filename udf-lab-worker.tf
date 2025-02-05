@@ -17,7 +17,7 @@ resource "aws_dynamodb_table" "lab_deployment_state" {
   }
 
   stream_enabled   = true
-  stream_view_type = "NEW_AND_OLD_IMAGES"  # ✅ Captures both inserts & deletes
+  stream_view_type = "NEW_AND_OLD_IMAGES"
 }
 
 data "aws_s3_object" "udf_worker_zip" {
@@ -121,6 +121,9 @@ resource "aws_lambda_event_source_mapping" "udf_worker_dynamodb_trigger" {
       pattern = "{ \"eventName\": [\"INSERT\"] }"
     }
   }
+  lifecycle {
+    ignore_changes = [filter_criteria] # Prevent Terraform from forcing recreation
+  }
 }
 
 /*
@@ -218,6 +221,10 @@ resource "aws_lambda_event_source_mapping" "udf_cleanup_dynamodb_trigger" {
     filter {
       pattern = "{ \"eventName\": [\"REMOVE\"] }"
     }
+  }
+
+  lifecycle {
+    ignore_changes = [filter_criteria]
   }
 }
 
