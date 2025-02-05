@@ -156,9 +156,11 @@ resource "aws_s3_bucket_notification" "cert_upload_trigger" {
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.cert_mgmt_mcn_lambda.arn
-    events              = ["s3:ObjectCreated:*"]
+    events              = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
     filter_prefix       = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
   }
+
+  depends_on = [aws_lambda_permission.allow_s3_to_invoke_cert_mgmt]
 }
 
 resource "aws_lambda_permission" "allow_s3_to_invoke_cert_mgmt" {
