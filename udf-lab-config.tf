@@ -31,6 +31,7 @@ resource "aws_dynamodb_table_item" "lab_cMIxKy" {
         role      = { S = "f5xc-web-app-scanning-user" }
       }}
     ]}
+    user_ns         = { BOOL = true }
     pre_lambda      = { S = "arn:aws:lambda:us-west-2:123456789012:function:pre-lambda" }
     post_lambda     = { NULL = true }
   })
