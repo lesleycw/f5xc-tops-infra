@@ -164,7 +164,7 @@ resource "aws_s3_bucket_notification" "mcn_cert_upload_trigger" {
 }
 
 resource "aws_lambda_permission" "mcn_allow_s3_to_invoke_cert_mgmt" {
-  statement_id  = "AllowExecutionFromS3"
+  statement_id  = "MCN-AllowExecutionFromS3"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cert_mgmt_mcn_lambda.function_name
   principal     = "s3.amazonaws.com"
@@ -208,7 +208,7 @@ resource "aws_s3_bucket_notification" "app_cert_upload_trigger" {
 }
 
 resource "aws_lambda_permission" "app_allow_s3_to_invoke_cert_mgmt" {
-  statement_id  = "AllowExecutionFromS3"
+  statement_id  = "App-AllowExecutionFromS3"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cert_mgmt_app_lambda.function_name
   principal     = "s3.amazonaws.com"
@@ -252,7 +252,7 @@ resource "aws_s3_bucket_notification" "sec_cert_upload_trigger" {
 }
 
 resource "aws_lambda_permission" "sec_allow_s3_to_invoke_cert_mgmt" {
-  statement_id  = "AllowExecutionFromS3"
+  statement_id  = "SEC-AllowExecutionFromS3"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cert_mgmt_sec_lambda.function_name
   principal     = "s3.amazonaws.com"
