@@ -30,7 +30,7 @@ module "app_lab_parameters" {
       type        = "String"
       value       = "https://f5-xc-lab-app.console.ves.volterra.io"
     }
-    "${local.app_base_path}/idm_type" = {
+    "${local.app_base_path}/idm-type" = {
       type        = "String"
       value       = "SSO"
     }
@@ -54,7 +54,7 @@ module "mcn_lab_parameters" {
       type        = "String"
       value       = "https://f5-xc-lab-mcn.console.ves.volterra.io"
     }
-    "${local.mcn_base_path}/idm_type" = {
+    "${local.mcn_base_path}/idm-type" = {
       type        = "String"
       value       = "SSO"
     }
@@ -78,7 +78,7 @@ module "sec_lab_parameters" {
       type        = "String"
       value       = "https://f5-xc-lab-sec.console.ves.volterra.io"
     }
-    "${local.sec_base_path}/idm_type" = {
+    "${local.sec_base_path}/idm-type" = {
       type        = "String"
       value       = "SSO"
     }
