@@ -23,28 +23,42 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = "${aws_iam_role.cert_mgmt_lambda_role.arn}"
+          "AWS" : "${aws_iam_role.cert_mgmt_lambda_role.arn}"
         },
         Action = [
           "s3:GetObject",
-          "s3:ListBucket",
           "s3:HeadObject"
         ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
+
       # ✅ Allow ACME Client Lambda to Read & Write Objects
       {
         Effect = "Allow",
         Principal = {
-          AWS = "${aws_iam_role.acme_client_lambda_role.arn}"
+          "AWS" : "${aws_iam_role.acme_client_lambda_role.arn}"
         },
         Action = [
           "s3:GetObject",
-          "s3:ListBucket",
           "s3:HeadObject",
           "s3:PutObject"
         ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
+      },
+
+      # ✅ Allow Both Lambdas to List Bucket Contents (Needed for GetObject)
+      {
+        Effect = "Allow",
+        Principal = {
+          "AWS" : [
+            "${aws_iam_role.acme_client_lambda_role.arn}",
+            "${aws_iam_role.cert_mgmt_lambda_role.arn}"
+          ]
+        },
+        Action = [
+          "s3:ListBucket"
+        ],
+        Resource = "${aws_s3_bucket.cert_bucket.arn}"
       }
     ]
   })
@@ -98,7 +112,10 @@ resource "aws_iam_policy" "cert_mgmt_lambda_policy" {
       },
       {
         Effect   = "Allow",
-        Action   = ["s3:GetObject", "s3:HeadObject"],
+        Action   = [
+          "s3:GetObject",
+          "s3:HeadObject"
+        ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
       {
@@ -182,7 +199,11 @@ resource "aws_iam_policy" "acme_client_lambda_policy" {
       },
       {
         Effect   = "Allow",
-        Action   = ["s3:GetObject", "s3:HeadObject", "s3:PutObject"],
+        Action   = [
+          "s3:GetObject",
+          "s3:HeadObject",
+          "s3:PutObject"
+        ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
       {
