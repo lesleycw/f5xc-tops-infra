@@ -19,7 +19,7 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
-      # ✅ Allow Lambda Role to Read & Write Objects
+      # ✅ Allow Cert Management Lambda to Read Objects
       {
         Effect = "Allow",
         Principal = {
@@ -31,6 +31,7 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
         ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
+      # ✅ Allow ACME Client Lambda to Read & Write Objects
       {
         Effect = "Allow",
         Principal = {
@@ -39,7 +40,8 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
         Action = [
           "s3:GetObject",
           "s3:HeadObject",
-          "s3:PutObject"
+          "s3:PutObject",
+          "s3:PutObjectAcl"
         ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       }
