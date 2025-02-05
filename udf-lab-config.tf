@@ -20,7 +20,7 @@ resource "aws_dynamodb_table_item" "lab_cMIxKy" {
   item = jsonencode({
     lab_id          = { S = "cMIxKy" }
     description     = { S = "Lab for testing" }
-    ssm_base_path   = { S = "${local.sec_base_path}" }
+    ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab" }
     sso_type        = { S = "SSO" }
     group_names     = { L = [
       { S = "xc-lab-users" }
@@ -32,7 +32,7 @@ resource "aws_dynamodb_table_item" "lab_cMIxKy" {
       }}
     ]}
     user_ns         = { BOOL = true }
-    pre_lambda      = { S = "arn:aws:lambda:us-west-2:123456789012:function:pre-lambda" }
+    pre_lambda      = { S = "${aws_lambda_function.cMIxKy_pre_lambda.arn}" }
     post_lambda     = { NULL = true }
   })
 }

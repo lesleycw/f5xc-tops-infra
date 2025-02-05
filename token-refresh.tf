@@ -24,7 +24,7 @@ resource "aws_iam_role" "token_refresh_lambda_role" {
 }
 
 resource "aws_iam_policy" "token_refresh_lambda_policy" {
-  name        = "TokenRefreshLambdaPolicy"
+  name        = "token-refresh-lambda-policy${var.environment == "prod" ? "" : "-${var.environment}"}"
   description = "IAM Policy for the Token Refresh Lambda Functions"
 
   policy = jsonencode({
