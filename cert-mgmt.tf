@@ -62,7 +62,7 @@ resource "aws_iam_policy" "cert_mgmt_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = ["s3:GetObject"],
-        Resource = "${aws_s3_bucket.cert_bucket.bucket}/*"
+        Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
       {
         Effect = "Allow",
@@ -146,7 +146,7 @@ resource "aws_iam_policy" "acme_client_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = ["s3:GetObject", "s3:PutObject"],
-        Resource = "${aws_s3_bucket.cert_bucket.bucket}/*"
+        Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
       {
         Effect = "Allow",
