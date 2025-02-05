@@ -127,6 +127,7 @@ resource "aws_iam_role_policy_attachment" "cert_mgmt_lambda_attach" {
   policy_arn = aws_iam_policy.cert_mgmt_lambda_policy.arn
 }
 
+/*Cert MGMT MCN Instance*/
 resource "aws_lambda_function" "cert_mgmt_mcn_lambda" {
   function_name    = "tops-cert-mgmt-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   role             = aws_iam_role.cert_mgmt_lambda_role.arn
@@ -148,6 +149,24 @@ resource "aws_lambda_function" "cert_mgmt_mcn_lambda" {
   }
 
   tags = local.tags
+}
+
+resource "aws_s3_bucket_notification" "cert_upload_trigger" {
+  bucket = aws_s3_bucket.cert_bucket.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.cert_mgmt_mcn_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
+  }
+}
+
+resource "aws_lambda_permission" "allow_s3_to_invoke_cert_mgmt" {
+  statement_id  = "AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cert_mgmt_mcn_lambda.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.cert_bucket.arn
 }
 
 /*
@@ -235,6 +254,13 @@ resource "aws_iam_role_policy_attachment" "acme_client_lambda_attach" {
   policy_arn = aws_iam_policy.acme_client_lambda_policy.arn
 }
 
+resource "aws_cloudwatch_event_rule" "acme_daily_trigger" {
+  name                = "acme-daily-trigger${var.environment == "prod" ? "" : "-${var.environment}"}"
+  description         = "Triggers the ACME Client Lambda daily"
+  schedule_expression = "rate(1 day)"
+}
+
+/*ACME MCN Lambda*/
 resource "aws_lambda_function" "acme_client_mcn_lambda" {
   function_name    = "tops-acme-client-mcn${var.environment == "prod" ? "" : "-${var.environment}"}"
   role             = aws_iam_role.acme_client_lambda_role.arn
@@ -244,7 +270,7 @@ resource "aws_lambda_function" "acme_client_mcn_lambda" {
   s3_key           = data.aws_s3_object.acme_client_zip.key
   source_code_hash = data.aws_s3_object.acme_client_zip.etag
 
-  timeout     = var.lambda_timeout
+  timeout     = 180
   memory_size = var.lambda_memory_size
 
   environment {
@@ -257,4 +283,18 @@ resource "aws_lambda_function" "acme_client_mcn_lambda" {
   }
 
   tags = local.tags
+}
+
+resource "aws_cloudwatch_event_target" "acme_lambda_target" {
+  rule      = aws_cloudwatch_event_rule.acme_daily_trigger.name
+  target_id = "acme_lambda_mcn"
+  arn       = aws_lambda_function.acme_client_mcn_lambda.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_to_invoke_acme" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.acme_client_mcn_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.acme_daily_trigger.arn
 }
