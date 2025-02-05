@@ -13,7 +13,6 @@ resource "aws_s3_bucket" "cert_bucket" {
   tags = local.tags
 }
 
-/*
 resource "aws_s3_bucket_policy" "cert_bucket_policy" {
   bucket = aws_s3_bucket.cert_bucket.id
 
@@ -47,7 +46,6 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
     ]
   })
 }
-*/
 
 output "cert_bucket_name" {
   value = aws_s3_bucket.cert_bucket.bucket
