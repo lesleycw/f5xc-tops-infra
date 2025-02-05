@@ -30,6 +30,10 @@ module "app_lab_parameters" {
       type        = "String"
       value       = "https://f5-xc-lab-app.console.ves.volterra.io"
     }
+    "${local.app_base_path}/idm_type" = {
+      type        = "String"
+      value       = "SSO"
+    }
     "${local.app_base_path}/token-name" = {
       type        = "String"
       value       = "tenant-ops-abkdibjd"
@@ -50,6 +54,10 @@ module "mcn_lab_parameters" {
       type        = "String"
       value       = "https://f5-xc-lab-mcn.console.ves.volterra.io"
     }
+    "${local.mcn_base_path}/idm_type" = {
+      type        = "String"
+      value       = "SSO"
+    }
     "${local.mcn_base_path}/token-name" = {
       type        = "String"
       value       = "tenant-ops-mrflfitl"
@@ -69,6 +77,10 @@ module "sec_lab_parameters" {
     "${local.sec_base_path}/tenant-url" = {
       type        = "String"
       value       = "https://f5-xc-lab-sec.console.ves.volterra.io"
+    }
+    "${local.sec_base_path}/idm_type" = {
+      type        = "String"
+      value       = "SSO"
     }
     "${local.sec_base_path}/token-name" = {
       type        = "String"

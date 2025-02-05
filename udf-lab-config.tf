@@ -21,7 +21,6 @@ resource "aws_dynamodb_table_item" "lab_cMIxKy" {
     lab_id          = { S = "cMIxKy" }
     description     = { S = "Lab for testing" }
     ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab" }
-    sso_type        = { S = "SSO" }
     group_names     = { L = [
       { S = "xc-lab-users" }
     ]}
