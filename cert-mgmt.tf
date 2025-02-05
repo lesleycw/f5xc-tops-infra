@@ -151,7 +151,7 @@ resource "aws_lambda_function" "cert_mgmt_mcn_lambda" {
   tags = local.tags
 }
 
-resource "aws_s3_bucket_notification" "cert_upload_trigger" {
+resource "aws_s3_bucket_notification" "mcn_cert_upload_trigger" {
   bucket = aws_s3_bucket.cert_bucket.id
 
   lambda_function {
@@ -160,10 +160,10 @@ resource "aws_s3_bucket_notification" "cert_upload_trigger" {
     filter_prefix       = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
   }
 
-  depends_on = [aws_lambda_permission.allow_s3_to_invoke_cert_mgmt]
+  depends_on = [aws_lambda_permission.mcn_allow_s3_to_invoke_cert_mgmt]
 }
 
-resource "aws_lambda_permission" "allow_s3_to_invoke_cert_mgmt" {
+resource "aws_lambda_permission" "mcn_allow_s3_to_invoke_cert_mgmt" {
   statement_id  = "AllowExecutionFromS3"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cert_mgmt_mcn_lambda.function_name
@@ -195,7 +195,7 @@ resource "aws_lambda_function" "cert_mgmt_app_lambda" {
   tags = local.tags
 }
 
-resource "aws_s3_bucket_notification" "cert_upload_trigger" {
+resource "aws_s3_bucket_notification" "app_cert_upload_trigger" {
   bucket = aws_s3_bucket.cert_bucket.id
 
   lambda_function {
@@ -204,10 +204,10 @@ resource "aws_s3_bucket_notification" "cert_upload_trigger" {
     filter_prefix       = "app-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
   }
 
-  depends_on = [aws_lambda_permission.allow_s3_to_invoke_cert_mgmt]
+  depends_on = [aws_lambda_permission.app_allow_s3_to_invoke_cert_mgmt]
 }
 
-resource "aws_lambda_permission" "allow_s3_to_invoke_cert_mgmt" {
+resource "aws_lambda_permission" "app_allow_s3_to_invoke_cert_mgmt" {
   statement_id  = "AllowExecutionFromS3"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cert_mgmt_app_lambda.function_name
@@ -239,7 +239,7 @@ resource "aws_lambda_function" "cert_mgmt_sec_lambda" {
   tags = local.tags
 }
 
-resource "aws_s3_bucket_notification" "cert_upload_trigger" {
+resource "aws_s3_bucket_notification" "sec_cert_upload_trigger" {
   bucket = aws_s3_bucket.cert_bucket.id
 
   lambda_function {
@@ -248,10 +248,10 @@ resource "aws_s3_bucket_notification" "cert_upload_trigger" {
     filter_prefix       = "sec-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
   }
 
-  depends_on = [aws_lambda_permission.allow_s3_to_invoke_cert_mgmt]
+  depends_on = [aws_lambda_permission.sec_allow_s3_to_invoke_cert_mgmt]
 }
 
-resource "aws_lambda_permission" "allow_s3_to_invoke_cert_mgmt" {
+resource "aws_lambda_permission" "sec_allow_s3_to_invoke_cert_mgmt" {
   statement_id  = "AllowExecutionFromS3"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cert_mgmt_sec_lambda.function_name
@@ -375,13 +375,13 @@ resource "aws_lambda_function" "acme_client_mcn_lambda" {
   tags = local.tags
 }
 
-resource "aws_cloudwatch_event_target" "acme_lambda_target" {
+resource "aws_cloudwatch_event_target" "mcn_acme_lambda_target" {
   rule      = aws_cloudwatch_event_rule.acme_daily_trigger.name
   target_id = "acme_lambda_mcn"
   arn       = aws_lambda_function.acme_client_mcn_lambda.arn
 }
 
-resource "aws_lambda_permission" "allow_eventbridge_to_invoke_acme" {
+resource "aws_lambda_permission" "mcn_allow_eventbridge_to_invoke_acme" {
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.acme_client_mcn_lambda.function_name
@@ -414,13 +414,13 @@ resource "aws_lambda_function" "acme_client_app_lambda" {
   tags = local.tags
 }
 
-resource "aws_cloudwatch_event_target" "acme_lambda_target" {
+resource "aws_cloudwatch_event_target" "app_acme_lambda_target" {
   rule      = aws_cloudwatch_event_rule.acme_daily_trigger.name
   target_id = "acme_lambda_app"
   arn       = aws_lambda_function.acme_client_app_lambda.arn
 }
 
-resource "aws_lambda_permission" "allow_eventbridge_to_invoke_acme" {
+resource "aws_lambda_permission" "app_allow_eventbridge_to_invoke_acme" {
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.acme_client_app_lambda.function_name
@@ -453,13 +453,13 @@ resource "aws_lambda_function" "acme_client_sec_lambda" {
   tags = local.tags
 }
 
-resource "aws_cloudwatch_event_target" "acme_lambda_target" {
+resource "aws_cloudwatch_event_target" "sec_acme_lambda_target" {
   rule      = aws_cloudwatch_event_rule.acme_daily_trigger.name
   target_id = "acme_lambda_sec"
   arn       = aws_lambda_function.acme_client_sec_lambda.arn
 }
 
-resource "aws_lambda_permission" "allow_eventbridge_to_invoke_acme" {
+resource "aws_lambda_permission" "sec_allow_eventbridge_to_invoke_acme" {
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.acme_client_sec_lambda.function_name
