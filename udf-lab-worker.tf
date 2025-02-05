@@ -52,7 +52,7 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
       # ✅ Allow Lambda to log
       {
         Effect   = "Allow",
-        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"],
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents", "logs:CreateLogGroup"],
         Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-udf-worker*"
       },
 

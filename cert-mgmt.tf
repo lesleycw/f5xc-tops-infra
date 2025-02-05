@@ -56,7 +56,7 @@ resource "aws_iam_policy" "cert_mgmt_lambda_policy" {
     Statement = [
       {
         Effect   = "Allow",
-        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"],
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents", "logs:CreateLogGroup"],
         Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-cert-mgmt*"
       },
       {

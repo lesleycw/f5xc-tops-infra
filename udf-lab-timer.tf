@@ -85,7 +85,7 @@ resource "aws_iam_policy" "udf_timer_lambda_policy" {
       # ✅ Allow Lambda to log
       {
         Effect   = "Allow",
-        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"],
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents", "logs:CreateLogGroup"],
         Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-udf-timer*"
       },
 
