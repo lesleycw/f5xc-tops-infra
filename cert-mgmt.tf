@@ -13,6 +13,7 @@ resource "aws_s3_bucket" "cert_bucket" {
   tags = local.tags
 }
 
+/*
 resource "aws_s3_bucket_policy" "cert_bucket_policy" {
   bucket = aws_s3_bucket.cert_bucket.id
 
@@ -26,7 +27,8 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
           AWS = aws_iam_role.cert_mgmt_lambda_role.arn
         },
         Action = [
-          "s3:GetObject"
+          "s3:GetObject",
+          "s3:HeadObject"
         ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
@@ -37,6 +39,7 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
         },
         Action = [
           "s3:GetObject",
+          "s3:HeadObject",
           "s3:PutObject"
         ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
@@ -44,6 +47,7 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
     ]
   })
 }
+*/
 
 output "cert_bucket_name" {
   value = aws_s3_bucket.cert_bucket.bucket
@@ -93,7 +97,7 @@ resource "aws_iam_policy" "cert_mgmt_lambda_policy" {
       },
       {
         Effect   = "Allow",
-        Action   = ["s3:GetObject"],
+        Action   = ["s3:GetObject", "s3:HeadObject"],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
       {
@@ -177,7 +181,7 @@ resource "aws_iam_policy" "acme_client_lambda_policy" {
       },
       {
         Effect   = "Allow",
-        Action   = ["s3:GetObject", "s3:PutObject"],
+        Action   = ["s3:GetObject", "s3:HeadObject", "s3:PutObject"],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       },
       {
