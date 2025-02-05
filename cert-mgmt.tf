@@ -23,10 +23,11 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = aws_iam_role.cert_mgmt_lambda_role.arn
+          AWS = "${aws_iam_role.cert_mgmt_lambda_role.arn}"
         },
         Action = [
           "s3:GetObject",
+          "s3:ListBucket",
           "s3:HeadObject"
         ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
@@ -35,13 +36,13 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = aws_iam_role.acme_client_lambda_role.arn
+          AWS = "${aws_iam_role.acme_client_lambda_role.arn}"
         },
         Action = [
           "s3:GetObject",
+          "s3:ListBucket",
           "s3:HeadObject",
-          "s3:PutObject",
-          "s3:PutObjectAcl"
+          "s3:PutObject"
         ],
         Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
       }
