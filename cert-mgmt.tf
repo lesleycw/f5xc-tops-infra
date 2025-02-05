@@ -13,6 +13,38 @@ resource "aws_s3_bucket" "cert_bucket" {
   tags = local.tags
 }
 
+resource "aws_s3_bucket_policy" "cert_bucket_policy" {
+  bucket = aws_s3_bucket.cert_bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      # ✅ Allow Lambda Role to Read & Write Objects
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = aws_iam_role.cert_mgmt_lambda_role.arn
+        },
+        Action = [
+          "s3:GetObject"
+        ],
+        Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
+      },
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = aws_iam_role.acme_client_lambda_role.arn
+        },
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject"
+        ],
+        Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
+      }
+    ]
+  })
+}
+
 output "cert_bucket_name" {
   value = aws_s3_bucket.cert_bucket.bucket
 }
