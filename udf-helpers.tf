@@ -58,7 +58,7 @@ data "aws_s3_object" "cMIxKy_pre_zip" {
 }
 
 resource "aws_lambda_function" "cMIxKy_pre_lambda" {
-  function_name    = "tops-cMIxKy-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
+  function_name    = "tops-helper-cMIxKy-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
   role             = aws_iam_role.token_refresh_lambda_role.arn
   runtime          = "python3.11"
   handler          = "function.lambda_handler"

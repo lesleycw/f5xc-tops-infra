@@ -17,64 +17,8 @@ resource "aws_dynamodb_table" "lab_deployment_state" {
   }
 
   stream_enabled   = true
-  stream_view_type = "OLD_IMAGE"
+  stream_view_type = "NEW_AND_OLD_IMAGES"  # ✅ Captures both inserts & deletes
 }
-
-resource "aws_sqs_queue" "udf_worker_queue" {
-  name                      = "tops-udf-worker-queue${var.environment == "prod" ? "" : "-${var.environment}"}"
-  message_retention_seconds = 3600
-  visibility_timeout_seconds = 60
-  delay_seconds             = 0
-  receive_wait_time_seconds = 10
-}
-
-resource "aws_sqs_queue_policy" "udf_worker_queue_policy" {
-  queue_url = aws_sqs_queue.udf_worker_queue.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid       = "AllowLambdaToConsumeSQS",
-        Effect    = "Allow",
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        },
-        Action    = "sqs:ReceiveMessage",
-        Resource  = aws_sqs_queue.udf_worker_queue.arn
-      },
-      {
-        Sid       = "AllowUDFToSendSQS",
-        Effect    = "Allow",
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        },
-        Action    = "sqs:SendMessage",
-        Condition = {
-          "ForAnyValue:StringEquals": {
-            "aws:PrincipalOrgPaths": var.udf_principal_org_path
-          }
-        }
-        Resource  = aws_sqs_queue.udf_worker_queue.arn
-      },
-      {
-        Sid       = "AllowSQSManagementForAccount",
-        Effect    = "Allow",
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        },
-        Action    = [
-          "sqs:SendMessage",
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes"
-        ],
-        Resource  = aws_sqs_queue.udf_worker_queue.arn
-      }
-    ]
-  })
-}
-
 
 data "aws_s3_object" "udf_worker_zip" {
   bucket = aws_s3_bucket.lambda_bucket.bucket
@@ -112,23 +56,16 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
         Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-udf-worker*"
       },
 
-      # ✅ Allow Lambda to receive and delete messages from SQS
-      {
-        Effect   = "Allow",
-        Action   = [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes",
-          "sqs:GetQueueUrl"
-        ],
-        Resource = aws_sqs_queue.udf_worker_queue.arn
-      },
-
       # ✅ Allow Lambda to interact with DynamoDB
       {
         Effect   = "Allow",
-        Action   = ["dynamodb:GetRecords", "dynamodb:PutItem", "dynamodb:UpdateItem"],
-        Resource = aws_dynamodb_table.lab_configuration.arn
+        Action   = [
+          "dynamodb:GetRecords",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DescribeStream" 
+        ],
+        Resource = aws_dynamodb_table.lab_deployment_state.arn
       },
 
       # ✅ Allow Lambda to invoke other Lambda functions
@@ -138,7 +75,7 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
         Resource = [
           "arn:aws:lambda:*:*:function:tops-user-create*",
           "arn:aws:lambda:*:*:function:tops-ns-create*",
-          "arn:aws:lambda:*:*:function:tops-lab-runner*"
+          "arn:aws:lambda:*:*:function:tops-helper*"
         ]
       }
     ]
@@ -159,17 +96,31 @@ resource "aws_lambda_function" "udf_worker_lambda" {
   s3_key           = data.aws_s3_object.udf_worker_zip.key
   source_code_hash = data.aws_s3_object.udf_worker_zip.etag
 
+  environment {
+    variables = {
+      DEPLOYMENT_STATE_TABLE      = aws_dynamodb_table.lab_deployment_state.name
+      LAB_CONFIGURATION_TABLE     = aws_dynamodb_table.lab_configuration.name
+    }
+  }
+
   timeout     = var.lambda_timeout
   memory_size = var.lambda_memory_size
 
   tags = local.tags
 }
 
-resource "aws_lambda_event_source_mapping" "udf_worker_sqs_trigger" {
-  function_name    = aws_lambda_function.udf_worker_lambda.arn
-  event_source_arn = aws_sqs_queue.udf_worker_queue.arn
-  batch_size       = 1
-  enabled          = true
+resource "aws_lambda_event_source_mapping" "udf_worker_dynamodb_trigger" {
+  function_name     = aws_lambda_function.udf_worker_lambda.arn
+  event_source_arn  = aws_dynamodb_table.lab_deployment_state.stream_arn
+  starting_position = "LATEST"
+  batch_size        = 1
+  enabled           = true
+
+  filter_criteria {
+    filter {
+      pattern = "{ \"eventName\": [\"INSERT\"] }"
+    }
+  }
 }
 
 /*
@@ -260,9 +211,15 @@ resource "aws_lambda_event_source_mapping" "udf_cleanup_dynamodb_trigger" {
   function_name     = aws_lambda_function.udf_cleanup_lambda.arn
   event_source_arn  = aws_dynamodb_table.lab_deployment_state.stream_arn
   starting_position = "LATEST"
+  batch_size        = 1
   enabled           = true
-}
 
+  filter_criteria {
+    filter {
+      pattern = "{ \"eventName\": [\"REMOVE\"] }"
+    }
+  }
+}
 
 
 
