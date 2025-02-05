@@ -68,6 +68,14 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
         Resource = aws_dynamodb_table.lab_deployment_state.arn
       },
 
+      {
+        Effect   = "Allow",
+        Action   = [
+          "dynamodb:GetRecords"
+        ],
+        Resource = aws_dynamodb_table.lab_configuration.arn
+      },
+
       # ✅ Allow Lambda to invoke other Lambda functions
       {
         Effect   = "Allow",
