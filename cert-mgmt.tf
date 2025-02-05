@@ -171,6 +171,94 @@ resource "aws_lambda_permission" "allow_s3_to_invoke_cert_mgmt" {
   source_arn    = aws_s3_bucket.cert_bucket.arn
 }
 
+/*Cert MGMT App Instance*/
+resource "aws_lambda_function" "cert_mgmt_app_lambda" {
+  function_name    = "tops-cert-mgmt-app${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.cert_mgmt_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.cert_mgmt_zip.bucket
+  s3_key           = data.aws_s3_object.cert_mgmt_zip.key
+  source_code_hash = data.aws_s3_object.cert_mgmt_zip.etag
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  environment {
+    variables = {
+      "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/app-lab"
+      "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket
+      "CERT_NAME"     = "app-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_s3_bucket_notification" "cert_upload_trigger" {
+  bucket = aws_s3_bucket.cert_bucket.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.cert_mgmt_app_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "app-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
+  }
+
+  depends_on = [aws_lambda_permission.allow_s3_to_invoke_cert_mgmt]
+}
+
+resource "aws_lambda_permission" "allow_s3_to_invoke_cert_mgmt" {
+  statement_id  = "AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cert_mgmt_app_lambda.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.cert_bucket.arn
+}
+
+/*Cert MGMT Sec Instance*/
+resource "aws_lambda_function" "cert_mgmt_sec_lambda" {
+  function_name    = "tops-cert-mgmt-sec${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.cert_mgmt_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.cert_mgmt_zip.bucket
+  s3_key           = data.aws_s3_object.cert_mgmt_zip.key
+  source_code_hash = data.aws_s3_object.cert_mgmt_zip.etag
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  environment {
+    variables = {
+      "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab"
+      "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket
+      "CERT_NAME"     = "sec-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_s3_bucket_notification" "cert_upload_trigger" {
+  bucket = aws_s3_bucket.cert_bucket.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.cert_mgmt_sec_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "sec-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
+  }
+
+  depends_on = [aws_lambda_permission.allow_s3_to_invoke_cert_mgmt]
+}
+
+resource "aws_lambda_permission" "allow_s3_to_invoke_cert_mgmt" {
+  statement_id  = "AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cert_mgmt_sec_lambda.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.cert_bucket.arn
+}
+
 /*
 Lambda function to act as ACME client to create/update certs
 */
@@ -297,6 +385,84 @@ resource "aws_lambda_permission" "allow_eventbridge_to_invoke_acme" {
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.acme_client_mcn_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.acme_daily_trigger.arn
+}
+
+/*ACME App Lambda*/
+resource "aws_lambda_function" "acme_client_app_lambda" {
+  function_name    = "tops-acme-client-app${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.acme_client_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.acme_client_zip.bucket
+  s3_key           = data.aws_s3_object.acme_client_zip.key
+  source_code_hash = data.aws_s3_object.acme_client_zip.etag
+
+  timeout     = 180
+  memory_size = var.lambda_memory_size
+
+  environment {
+    variables = {
+      "CERT_NAME"     = "app-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
+      "DOMAIN"        = "app-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
+      "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket,
+      "EMAIL"         = var.acme_email
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_cloudwatch_event_target" "acme_lambda_target" {
+  rule      = aws_cloudwatch_event_rule.acme_daily_trigger.name
+  target_id = "acme_lambda_app"
+  arn       = aws_lambda_function.acme_client_app_lambda.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_to_invoke_acme" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.acme_client_app_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.acme_daily_trigger.arn
+}
+
+/*ACME Sec Lambda*/
+resource "aws_lambda_function" "acme_client_sec_lambda" {
+  function_name    = "tops-acme-client-sec${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.acme_client_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.acme_client_zip.bucket
+  s3_key           = data.aws_s3_object.acme_client_zip.key
+  source_code_hash = data.aws_s3_object.acme_client_zip.etag
+
+  timeout     = 180
+  memory_size = var.lambda_memory_size
+
+  environment {
+    variables = {
+      "CERT_NAME"     = "sec-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
+      "DOMAIN"        = "sec-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
+      "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket,
+      "EMAIL"         = var.acme_email
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_cloudwatch_event_target" "acme_lambda_target" {
+  rule      = aws_cloudwatch_event_rule.acme_daily_trigger.name
+  target_id = "acme_lambda_sec"
+  arn       = aws_lambda_function.acme_client_sec_lambda.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_to_invoke_acme" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.acme_client_sec_lambda.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.acme_daily_trigger.arn
 }
