@@ -56,16 +56,25 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
         Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-udf-worker*"
       },
 
-      # ✅ Allow Lambda to interact with DynamoDB
+      # ✅ Allow Lambda to read from the **DynamoDB Stream** (use stream ARN)
       {
         Effect   = "Allow",
         Action   = [
           "dynamodb:GetRecords",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem",
           "dynamodb:DescribeStream",
           "dynamodb:GetShardIterator",
           "dynamodb:ListStreams"
+        ],
+        Resource = aws_dynamodb_table.lab_deployment_state.stream_arn
+      },
+
+      # ✅ Allow Lambda to interact with **DynamoDB Table** (use table ARN)
+      {
+        Effect   = "Allow",
+        Action   = [
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:GetItem"
         ],
         Resource = aws_dynamodb_table.lab_deployment_state.arn
       },
@@ -73,7 +82,7 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = [
-          "dynamodb:GetRecords"
+          "dynamodb:GetItem"
         ],
         Resource = aws_dynamodb_table.lab_configuration.arn
       },
@@ -110,6 +119,10 @@ resource "aws_lambda_function" "udf_worker_lambda" {
     variables = {
       DEPLOYMENT_STATE_TABLE      = aws_dynamodb_table.lab_deployment_state.name
       LAB_CONFIGURATION_TABLE     = aws_dynamodb_table.lab_configuration.name
+      USER_CREATE_LAMBDA_FUNCTION = aws_lambda_function.user_create_lambda.arn
+      USER_REMOVE_LAMBDA_FUNCTION = aws_lambda_function.user_remove_lambda.arn
+      NS_CREATE_LAMBDA_FUNCTION   = aws_lambda_function.ns_create_lambda.arn
+      NS_REMOVE_LAMBDA_FUNCTION   = aws_lambda_function.ns_remove_lambda.arn
     }
   }
 
