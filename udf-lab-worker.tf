@@ -63,7 +63,9 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
           "dynamodb:GetRecords",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
-          "dynamodb:DescribeStream" 
+          "dynamodb:DescribeStream",
+          "dynamodb:GetShardIterator",
+          "dynamodb:ListStreams"
         ],
         Resource = aws_dynamodb_table.lab_deployment_state.arn
       },
@@ -130,7 +132,7 @@ resource "aws_lambda_event_source_mapping" "udf_worker_dynamodb_trigger" {
     }
   }
   lifecycle {
-    ignore_changes = [filter_criteria] # Prevent Terraform from forcing recreation
+    ignore_changes = [filter_criteria] 
   }
 }
 
@@ -168,18 +170,20 @@ resource "aws_iam_policy" "udf_cleanup_lambda_policy" {
     Statement = [
       {
         Effect   = "Allow",
-        Action   = "dynamodb:DescribeStream",
-        Resource = aws_dynamodb_table.lab_deployment_state.stream_arn
+        Action   = [
+          "dynamodb:GetRecords",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DescribeStream",
+          "dynamodb:GetShardIterator",
+          "dynamodb:ListStreams"
+        ],
+        Resource = aws_dynamodb_table.lab_deployment_state.arn
       },
       {
         Effect   = "Allow",
-        Action   = "dynamodb:GetRecords",
-        Resource = aws_dynamodb_table.lab_deployment_state.stream_arn
-      },
-      {
-        Effect   = "Allow",
-        Action   = "dynamodb:GetShardIterator",
-        Resource = aws_dynamodb_table.lab_deployment_state.stream_arn
+        Action   = ["dynamodb:GetRecords"],
+        Resource = aws_dynamodb_table.lab_configuration.arn
       },
       {
         Effect   = "Allow",
