@@ -22,7 +22,9 @@ resource "aws_dynamodb_table_item" "lab_cMIxKy" {
     description     = { S = "Lab for testing" }
     ssm_base_path   = { S = "${local.sec_base_path}" }
     sso_type        = { S = "SSO" }
-    group_names     = { L = ["xc-lab-users"] }
+    group_names     = { L = [
+      { S = "xc-lab-users" }
+    ]}
     namespace_roles = { L = [
       { M = {
         namespace = { S = "system" }
