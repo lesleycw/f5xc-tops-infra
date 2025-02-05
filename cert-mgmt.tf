@@ -27,9 +27,12 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
         },
         Action = [
           "s3:GetObject",
-          "s3:HeadObject"
+          "s3:ListBucket" 
         ],
-        Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
+        Resource = [
+          "${aws_s3_bucket.cert_bucket.arn}/*",
+          "${aws_s3_bucket.cert_bucket.arn}"
+        ]
       },
 
       # ✅ Allow ACME Client Lambda to Read & Write Objects
@@ -40,25 +43,13 @@ resource "aws_s3_bucket_policy" "cert_bucket_policy" {
         },
         Action = [
           "s3:GetObject",
-          "s3:HeadObject",
-          "s3:PutObject"
-        ],
-        Resource = "${aws_s3_bucket.cert_bucket.arn}/*"
-      },
-
-      # ✅ Allow Both Lambdas to List Bucket Contents (Needed for GetObject)
-      {
-        Effect = "Allow",
-        Principal = {
-          "AWS" : [
-            "${aws_iam_role.acme_client_lambda_role.arn}",
-            "${aws_iam_role.cert_mgmt_lambda_role.arn}"
-          ]
-        },
-        Action = [
+          "s3:PutObject",
           "s3:ListBucket"
         ],
-        Resource = "${aws_s3_bucket.cert_bucket.arn}"
+        Resource = [
+          "${aws_s3_bucket.cert_bucket.arn}/*",
+          "${aws_s3_bucket.cert_bucket.arn}"
+        ]
       }
     ]
   })
