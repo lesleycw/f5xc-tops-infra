@@ -71,19 +71,6 @@ resource "aws_iam_policy" "acme_client_lambda_policy" {
           "route53:GetChange"
         ],
         Resource = ["*"]
-      },
-      # ✅ Allow EventBridge (CloudWatch Events) to invoke the Lambda functions
-      {
-        Effect   = "Allow",
-        Action   = ["lambda:InvokeFunction"],
-        Principal = {
-          "Service": "events.amazonaws.com"
-        },
-        Resource = [
-          aws_lambda_function.acme_client_mcn_lambda.arn,
-          aws_lambda_function.acme_client_app_lambda.arn,
-          aws_lambda_function.acme_client_sec_lambda.arn
-        ]
       }
     ]
   })
@@ -131,6 +118,14 @@ resource "aws_cloudwatch_event_target" "mcn_acme_lambda_target" {
   arn       = aws_lambda_function.acme_client_mcn_lambda.arn
 }
 
+resource "aws_lambda_permission" "mcn_allow_eventbridge_to_invoke_acme" {
+  statement_id  = "MCN-AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.acme_client_mcn_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.acme_daily_trigger.arn
+}
+
 /*ACME App Lambda*/
 resource "aws_lambda_function" "acme_client_app_lambda" {
   function_name    = "tops-acme-client-app${var.environment == "prod" ? "" : "-${var.environment}"}"
@@ -154,6 +149,14 @@ resource "aws_lambda_function" "acme_client_app_lambda" {
   }
 
   tags = local.tags
+}
+
+resource "aws_lambda_permission" "app_allow_eventbridge_to_invoke_acme" {
+  statement_id  = "APP-AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.acme_client_app_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.acme_daily_trigger.arn
 }
 
 resource "aws_cloudwatch_event_target" "app_acme_lambda_target" {
@@ -191,4 +194,12 @@ resource "aws_cloudwatch_event_target" "sec_acme_lambda_target" {
   rule      = aws_cloudwatch_event_rule.acme_daily_trigger.name
   target_id = "acme_lambda_sec"
   arn       = aws_lambda_function.acme_client_sec_lambda.arn
+}
+
+resource "aws_lambda_permission" "sec_allow_eventbridge_to_invoke_acme" {
+  statement_id  = "SEC-AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.acme_client_sec_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.acme_daily_trigger.arn
 }

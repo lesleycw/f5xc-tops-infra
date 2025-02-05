@@ -117,19 +117,6 @@ resource "aws_iam_policy" "cert_mgmt_lambda_policy" {
           "ssm:GetParametersByPath"
         ],
         Resource = "arn:aws:ssm:us-east-1:317124676658:parameter/*"
-      },
-      # ✅ Allow S3 to invoke Lambda
-      {
-        Effect   = "Allow",
-        Action   = ["lambda:InvokeFunction"],
-        Principal = {
-          "Service": "s3.amazonaws.com"
-        },
-        Resource = [
-          aws_lambda_function.cert_mgmt_mcn_lambda.arn,
-          aws_lambda_function.cert_mgmt_app_lambda.arn,
-          aws_lambda_function.cert_mgmt_sec_lambda.arn
-        ]
       }
     ]
   })
@@ -186,6 +173,14 @@ resource "aws_lambda_function" "cert_mgmt_mcn_lambda" {
   tags = local.tags
 }
 
+resource "aws_lambda_permission" "mcn_allow_s3_to_invoke_cert_mgmt" {
+  statement_id  = "MCN-AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cert_mgmt_mcn_lambda.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.cert_bucket.arn
+}
+
 /*Cert MGMT App Instance*/
 resource "aws_lambda_function" "cert_mgmt_app_lambda" {
   function_name    = "tops-cert-mgmt-app${var.environment == "prod" ? "" : "-${var.environment}"}"
@@ -210,6 +205,14 @@ resource "aws_lambda_function" "cert_mgmt_app_lambda" {
   tags = local.tags
 }
 
+resource "aws_lambda_permission" "app_allow_s3_to_invoke_cert_mgmt" {
+  statement_id  = "App-AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cert_mgmt_app_lambda.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.cert_bucket.arn
+}
+
 /*Cert MGMT Sec Instance*/
 resource "aws_lambda_function" "cert_mgmt_sec_lambda" {
   function_name    = "tops-cert-mgmt-sec${var.environment == "prod" ? "" : "-${var.environment}"}"
@@ -232,4 +235,12 @@ resource "aws_lambda_function" "cert_mgmt_sec_lambda" {
   }
 
   tags = local.tags
+}
+
+resource "aws_lambda_permission" "sec_allow_s3_to_invoke_cert_mgmt" {
+  statement_id  = "SEC-AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cert_mgmt_sec_lambda.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.cert_bucket.arn
 }
