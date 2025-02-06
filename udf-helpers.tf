@@ -66,6 +66,12 @@ resource "aws_lambda_function" "cMIxKy_pre_lambda" {
   s3_key           = data.aws_s3_object.cMIxKy_pre_zip.key
   source_code_hash = data.aws_s3_object.cMIxKy_pre_zip.etag
 
+  environment {
+    variables = {
+      BASE_DOMAIN = "sec-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com"
+    }
+  }
+
   timeout     = var.lambda_timeout
   memory_size = var.lambda_memory_size
 
