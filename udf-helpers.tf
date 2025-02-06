@@ -68,7 +68,7 @@ resource "aws_lambda_function" "cMIxKy_pre_lambda" {
 
   environment {
     variables = {
-      BASE_DOMAIN = "sec-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com"
+      ENV = "${var.environment}"
     }
   }
 
