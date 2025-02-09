@@ -9,6 +9,17 @@ resource "aws_dynamodb_table" "lab_configuration" {
   }
 }
 
+resource "aws_s3_bucket" "lab_registry_bucket" {
+  bucket        = "tops-registry${var.environment == "prod" ? "" : "-${var.environment}"}"
+  force_destroy = true
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  tags = local.tags
+}
+
 /*
 Individual Lab Configs here
 */
@@ -34,4 +45,16 @@ resource "aws_dynamodb_table_item" "lab_cMIxKy" {
     pre_lambda      = { S = "${aws_lambda_function.cMIxKy_pre_lambda.arn}" }
     post_lambda     = { NULL = true }
   })
+}
+
+resource "aws_s3_object" "lab_info_cMIxKy" {
+  bucket  = aws_s3_bucket.lab_registry_bucket.bucket
+  key     = "cMIxKy.yaml"
+  content = <<EOT
+lab_id: cMIxKy
+sqsURL: "${aws_sqs_queue.udf_queue.url}"
+EOT
+
+  content_type = "text/yaml"
+  etag         = md5(filebase64("${path.module}/cMIxKy.yaml"))
 }
