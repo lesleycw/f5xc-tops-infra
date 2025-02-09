@@ -10,7 +10,7 @@ resource "aws_dynamodb_table" "lab_configuration" {
 }
 
 resource "aws_s3_bucket" "lab_registry_bucket" {
-  bucket        = "tops-registry${var.environment == "prod" ? "" : "-${var.environment}"}"
+  bucket        = "tops-registry-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
   force_destroy = true
 
   lifecycle {
