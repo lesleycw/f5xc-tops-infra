@@ -56,5 +56,4 @@ sqsURL: "${aws_sqs_queue.udf_queue.url}"
 EOT
 
   content_type = "text/yaml"
-  etag         = md5(filebase64("${path.module}/cMIxKy.yaml"))
 }
