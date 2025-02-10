@@ -25,7 +25,7 @@ resource "aws_sqs_queue_policy" "udf_queue_policy" {
         Sid       = "AllowUDFToSendSQS",
         Effect    = "Allow",
         Principal = {
-          Service = "lambda.amazonaws.com"
+          AWS = "*"
         },
         Action    = "sqs:SendMessage",
         Condition = {
