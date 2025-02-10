@@ -4,10 +4,10 @@ UDF Worker Lambda
 resource "aws_dynamodb_table" "lab_deployment_state" {
   name         = "tops-lab-deployment-state${var.environment == "prod" ? "" : "-${var.environment}"}"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "deployment_id"
+  hash_key     = "depID"
 
   attribute {
-    name = "deployment_id"
+    name = "depID"
     type = "S"
   }
 
