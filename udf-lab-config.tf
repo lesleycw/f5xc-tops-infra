@@ -20,7 +20,7 @@ resource "aws_s3_bucket" "lab_registry_bucket" {
   tags = local.tags
 }
 
-resource "aws_s3_bucket_policy" "lab_config_policy" {
+resource "aws_s3_bucket_policy" "lab_registry_policy" {
   bucket = aws_s3_bucket.lab_registry_bucket.id
   policy = jsonencode({
     Version = "2012-10-17",
@@ -29,7 +29,7 @@ resource "aws_s3_bucket_policy" "lab_config_policy" {
         Sid       = "AllowCrossAccountRead",
         Effect    = "Allow",
         Condition = {
-          "ForAnyValue:StringLike": {
+          "StringLike": {
             "aws:PrincipalOrgPaths": var.udf_principal_org_path
           }
         },
@@ -38,8 +38,8 @@ resource "aws_s3_bucket_policy" "lab_config_policy" {
           "s3:ListBucket"
         ],
         Resource = [
-          "${aws_s3_bucket.lab_registry_bucket.bucket}",
-          "${aws_s3_bucket.lab_registry_bucket.bucket}/*"
+          "arn:aws:s3:::${aws_s3_bucket.lab_registry_bucket.bucket}",
+          "arn:aws:s3:::${aws_s3_bucket.lab_registry_bucket.bucket}/*"
         ]
       }
     ]
