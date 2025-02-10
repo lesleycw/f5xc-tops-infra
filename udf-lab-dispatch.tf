@@ -86,7 +86,7 @@ resource "aws_iam_policy" "udf_dispatch_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = ["logs:CreateLogStream", "logs:PutLogEvents", "logs:CreateLogGroup"],
-        Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-udf-dispatch*"
+        Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/tops-udf-dispatch*:*"
       },
 
       # ✅ Allow Lambda to receive and delete messages from SQS
@@ -105,11 +105,10 @@ resource "aws_iam_policy" "udf_dispatch_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = [
-          "dynamodb:GetRecords",
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem"
-        ]
+          "dynamodb:GetItem",   # ✅ Fetch a single item
+          "dynamodb:PutItem",   # ✅ Insert new records
+          "dynamodb:UpdateItem" # ✅ Update existing records (extend TTL)
+        ],
         Resource = aws_dynamodb_table.lab_deployment_state.arn
       }
     ]
