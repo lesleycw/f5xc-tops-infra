@@ -28,6 +28,7 @@ resource "aws_s3_bucket_policy" "lab_registry_policy" {
       {
         Sid       = "AllowCrossAccountRead",
         Effect    = "Allow",
+        Principal = "*", 
         Condition = {
           "StringLike": {
             "aws:PrincipalOrgPaths": var.udf_principal_org_path
@@ -35,7 +36,8 @@ resource "aws_s3_bucket_policy" "lab_registry_policy" {
         },
         Action = [
           "s3:GetObject",
-          "s3:ListBucket"
+          "s3:ListBucket",
+          "s3:GetBucketLocation"
         ],
         Resource = [
           "arn:aws:s3:::${aws_s3_bucket.lab_registry_bucket.bucket}",
