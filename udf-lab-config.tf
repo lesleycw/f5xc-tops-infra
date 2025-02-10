@@ -30,17 +30,31 @@ resource "aws_s3_bucket_policy" "lab_registry_policy" {
         Effect    = "Allow",
         Principal = "*", 
         Condition = {
-          "StringLike": {
+          "ForAnyValue:StringLike": {
             "aws:PrincipalOrgPaths": var.udf_principal_org_path
           }
         },
         Action = [
-          "s3:GetObject",
           "s3:ListBucket",
           "s3:GetBucketLocation"
         ],
         Resource = [
-          "arn:aws:s3:::${aws_s3_bucket.lab_registry_bucket.bucket}",
+          "arn:aws:s3:::${aws_s3_bucket.lab_registry_bucket.bucket}"
+        ]
+      },
+     {
+        Sid       = "ReadFiles",
+        Effect    = "Allow",
+        Principal = "*", 
+        Condition = {
+          "ForAnyValue:StringLike": {
+            "aws:PrincipalOrgPaths": var.udf_principal_org_path
+          }
+        },
+        Action = [
+          "s3:GetObject"
+        ],
+        Resource = [
           "arn:aws:s3:::${aws_s3_bucket.lab_registry_bucket.bucket}/*"
         ]
       }
