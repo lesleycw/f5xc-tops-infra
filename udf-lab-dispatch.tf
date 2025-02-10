@@ -104,7 +104,12 @@ resource "aws_iam_policy" "udf_dispatch_lambda_policy" {
       # ✅ Allow Lambda to interact with DynamoDB
       {
         Effect   = "Allow",
-        Action   = ["dynamodb:GetRecords", "dynamodb:PutItem", "dynamodb:UpdateItem"],
+        Action   = [
+          "dynamodb:GetRecords",
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
+        ]
         Resource = aws_dynamodb_table.lab_deployment_state.arn
       }
     ]
