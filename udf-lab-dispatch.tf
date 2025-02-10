@@ -29,7 +29,7 @@ resource "aws_sqs_queue_policy" "udf_queue_policy" {
         },
         Action    = "sqs:SendMessage",
         Condition = {
-          "ForAnyValue:StringEquals": {
+          "ForAnyValue:StringLike": {
             "aws:PrincipalOrgPaths": var.udf_principal_org_path
           }
         }
