@@ -124,6 +124,17 @@ resource "aws_dynamodb_table_item" "lab_fd6bfa98" {
   })
 }
 
+resource "aws_s3_object" "lab_info_fd6bfa98" {
+  bucket  = aws_s3_bucket.lab_registry_bucket.bucket
+  key     = "fd6bfa98.yaml"
+  content = <<EOT
+lab_id: fd6bfa98
+sqsURL: "${aws_sqs_queue.udf_queue.url}"
+EOT
+
+  content_type = "text/yaml"
+}
+
 ########################################
 # App Tenant Base Lab                  #
 ########################################
@@ -145,6 +156,17 @@ resource "aws_dynamodb_table_item" "lab_10da9e42" {
   })
 }
 
+resource "aws_s3_object" "lab_info_10da9e42" {
+  bucket  = aws_s3_bucket.lab_registry_bucket.bucket
+  key     = "10da9e42.yaml"
+  content = <<EOT
+lab_id: 10da9e42
+sqsURL: "${aws_sqs_queue.udf_queue.url}"
+EOT
+
+  content_type = "text/yaml"
+}
+
 ########################################
 # Sec Tenant Base Lab                  #
 ########################################
@@ -164,6 +186,17 @@ resource "aws_dynamodb_table_item" "lab_a09e1e9d" {
     pre_lambda      = { NULL = true }
     post_lambda     = { NULL = true }
   })
+}
+
+resource "aws_s3_object" "lab_info_a09e1e9d" {
+  bucket  = aws_s3_bucket.lab_registry_bucket.bucket
+  key     = "a09e1e9d.yaml"
+  content = <<EOT
+lab_id: a09e1e9d
+sqsURL: "${aws_sqs_queue.udf_queue.url}"
+EOT
+
+  content_type = "text/yaml"
 }
 
 
