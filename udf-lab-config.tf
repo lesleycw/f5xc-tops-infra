@@ -69,14 +69,14 @@ Individual Lab Configs here
 ########################################
 # Example Lab                          #
 ########################################
-resource "aws_dynamodb_table_item" "lab_cMIxKy" {
+resource "aws_dynamodb_table_item" "lab_e37500bc" {
   table_name = aws_dynamodb_table.lab_configuration.name
   hash_key   = "lab_id"
 
   item = jsonencode({
-    lab_id          = { S = "cMIxKy" }
+    lab_id          = { S = "e37500bc" }
     description     = { S = "Example lab for testing" }
-    ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab" }
+    ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab" }
     group_names     = { L = [
       { S = "xc-lab-users" }
     ]}
@@ -92,11 +92,11 @@ resource "aws_dynamodb_table_item" "lab_cMIxKy" {
   })
 }
 
-resource "aws_s3_object" "lab_info_cMIxKy" {
+resource "aws_s3_object" "lab_info_e37500bc" {
   bucket  = aws_s3_bucket.lab_registry_bucket.bucket
-  key     = "cMIxKy.yaml"
+  key     = "e37500bc.yaml"
   content = <<EOT
-lab_id: cMIxKy
+lab_id: e37500bc
 sqsURL: "${aws_sqs_queue.udf_queue.url}"
 EOT
 
