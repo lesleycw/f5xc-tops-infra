@@ -52,19 +52,128 @@ resource "aws_iam_role_policy_attachment" "udf_helpers_lambda_attach" {
 Function Resources
 */
 
-data "aws_s3_object" "cMIxKy_pre_zip" {
+#Example Lab
+data "aws_s3_object" "example_pre_zip" {
   bucket = aws_s3_bucket.lambda_bucket.bucket
-  key    = "cMIxKy-pre${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+  key    = "example-pre${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
 }
 
-resource "aws_lambda_function" "cMIxKy_pre_lambda" {
+resource "aws_lambda_function" "example_pre_lambda" {
   function_name    = "tops-helper-cMIxKy-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
   role             = aws_iam_role.token_refresh_lambda_role.arn
   runtime          = "python3.11"
   handler          = "function.lambda_handler"
-  s3_bucket        = data.aws_s3_object.cMIxKy_pre_zip.bucket
-  s3_key           = data.aws_s3_object.cMIxKy_pre_zip.key
-  source_code_hash = data.aws_s3_object.cMIxKy_pre_zip.etag
+  s3_bucket        = data.aws_s3_object.example_pre_zip.bucket
+  s3_key           = data.aws_s3_object.example_pre_zip.key
+  source_code_hash = data.aws_s3_object.example_pre_zip.etag
+
+  environment {
+    variables = {
+      ENV = "${var.environment}"
+    }
+  }
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  tags = local.tags
+}
+
+#API Lab
+data "aws_s3_object" "apilab_pre_zip" {
+  bucket = aws_s3_bucket.lambda_bucket.bucket
+  key    = "apilab-pre${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+}
+
+resource "aws_lambda_function" "apilab_pre_lambda" {
+  function_name    = "tops-helper-apilab-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.token_refresh_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.apilab_pre_zip.bucket
+  s3_key           = data.aws_s3_object.apilab_pre_zip.key
+  source_code_hash = data.aws_s3_object.apilab_pre_zip.etag
+
+  environment {
+    variables = {
+      ENV = "${var.environment}"
+    }
+  }
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  tags = local.tags
+}
+
+#Bot Lab
+data "aws_s3_object" "botlab_pre_zip" {
+  bucket = aws_s3_bucket.lambda_bucket.bucket
+  key    = "botlab-pre${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+}
+
+resource "aws_lambda_function" "botlab_pre_lambda" {
+  function_name    = "tops-helper-botlab-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.token_refresh_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.botlab_pre_zip.bucket
+  s3_key           = data.aws_s3_object.botlab_pre_zip.key
+  source_code_hash = data.aws_s3_object.botlab_pre_zip.etag
+
+  environment {
+    variables = {
+      ENV = "${var.environment}"
+    }
+  }
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  tags = local.tags
+}
+
+#CAAS Lab
+data "aws_s3_object" "casslab_pre_zip" {
+  bucket = aws_s3_bucket.lambda_bucket.bucket
+  key    = "caaslab-pre${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+}
+
+resource "aws_lambda_function" "caaslab_pre_lambda" {
+  function_name    = "tops-helper-caaslab-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.token_refresh_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.caaslab_pre_zip.bucket
+  s3_key           = data.aws_s3_object.caaslab_pre_zip.key
+  source_code_hash = data.aws_s3_object.caaslab_pre_zip.etag
+
+  environment {
+    variables = {
+      ENV = "${var.environment}"
+    }
+  }
+
+  timeout     = var.lambda_timeout
+  memory_size = var.lambda_memory_size
+
+  tags = local.tags
+}
+
+#WAAP Lab
+data "aws_s3_object" "waaplab_pre_zip" {
+  bucket = aws_s3_bucket.lambda_bucket.bucket
+  key    = "waaplab-pre${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
+}
+
+resource "aws_lambda_function" "waaplab_pre_lambda" {
+  function_name    = "tops-helper-waaplab-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
+  role             = aws_iam_role.token_refresh_lambda_role.arn
+  runtime          = "python3.11"
+  handler          = "function.lambda_handler"
+  s3_bucket        = data.aws_s3_object.waaplab_pre_zip.bucket
+  s3_key           = data.aws_s3_object.waaplab_pre_zip.key
+  source_code_hash = data.aws_s3_object.waaplab_pre_zip.etag
 
   environment {
     variables = {
