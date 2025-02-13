@@ -154,7 +154,7 @@ resource "aws_dynamodb_table_item" "lab_a09e1e9d" {
 
   item = jsonencode({
     lab_id          = { S = "a09e1e9d" }
-    description     = { S = "App Tenant Base Lab" }
+    description     = { S = "Sec Tenant Base Lab" }
     ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab" }
     group_names     = { L = [
       { S = "xc-lab-users" }
