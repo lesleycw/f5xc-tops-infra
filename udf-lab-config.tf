@@ -117,7 +117,7 @@ resource "aws_dynamodb_table_item" "lab_fd6bfa98" {
     group_names     = { L = [
       { S = "xc-lab-users" }
     ]}
-    namespace_roles = { NULL = true }
+    namespace_roles = { L = [] }
     user_ns         = { BOOL = true }
     pre_lambda      = { NULL = true }
     post_lambda     = { NULL = true }
@@ -138,7 +138,7 @@ resource "aws_dynamodb_table_item" "lab_10da9e42" {
     group_names     = { L = [
       { S = "xc-lab-users" }
     ]}
-    namespace_roles = { NULL = true }
+    namespace_roles = { L = [] }
     user_ns         = { BOOL = true }
     pre_lambda      = { NULL = true }
     post_lambda     = { NULL = true }
@@ -159,7 +159,7 @@ resource "aws_dynamodb_table_item" "lab_a09e1e9d" {
     group_names     = { L = [
       { S = "xc-lab-users" }
     ]}
-    namespace_roles = { NULL = true }
+    namespace_roles = { L = [] }
     user_ns         = { BOOL = true }
     pre_lambda      = { NULL = true }
     post_lambda     = { NULL = true }
