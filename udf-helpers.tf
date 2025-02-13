@@ -134,7 +134,7 @@ resource "aws_lambda_function" "botlab_pre_lambda" {
 }
 
 #CAAS Lab
-data "aws_s3_object" "casslab_pre_zip" {
+data "aws_s3_object" "caaslab_pre_zip" {
   bucket = aws_s3_bucket.lambda_bucket.bucket
   key    = "caaslab-pre${var.environment == "prod" ? "" : "_${var.environment}"}.zip"
 }
