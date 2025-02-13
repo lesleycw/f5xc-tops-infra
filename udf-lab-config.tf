@@ -240,7 +240,7 @@ resource "aws_dynamodb_table_item" "lab_d3c24766" {
   })
 }
 
-resource "aws_s3_object" "lab_info_811c573b" {
+resource "aws_s3_object" "lab_info_d3c24766" {
   bucket  = aws_s3_bucket.lab_registry_bucket.bucket
   key     = "811c573b.yaml"
   content = <<EOT
