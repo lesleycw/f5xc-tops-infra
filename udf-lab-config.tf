@@ -104,6 +104,70 @@ EOT
 }
 
 ########################################
+# MCN Tenant Base Lab                  #
+########################################
+resource "aws_dynamodb_table_item" "lab_fd6bfa98" {
+  table_name = aws_dynamodb_table.lab_configuration.name
+  hash_key   = "lab_id"
+
+  item = jsonencode({
+    lab_id          = { S = "fd6bfa98" }
+    description     = { S = "MCN Tenant Base Lab" }
+    ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab" }
+    group_names     = { L = [
+      { S = "xc-lab-users" }
+    ]}
+    namespace_roles = { NULL = true }
+    user_ns         = { BOOL = true }
+    pre_lambda      = { NULL = true }
+    post_lambda     = { NULL = true }
+  })
+}
+
+########################################
+# App Tenant Base Lab                  #
+########################################
+resource "aws_dynamodb_table_item" "lab_10da9e42" {
+  table_name = aws_dynamodb_table.lab_configuration.name
+  hash_key   = "lab_id"
+
+  item = jsonencode({
+    lab_id          = { S = "10da9e42" }
+    description     = { S = "App Tenant Base Lab" }
+    ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/app-lab" }
+    group_names     = { L = [
+      { S = "xc-lab-users" }
+    ]}
+    namespace_roles = { NULL = true }
+    user_ns         = { BOOL = true }
+    pre_lambda      = { NULL = true }
+    post_lambda     = { NULL = true }
+  })
+}
+
+########################################
+# Sec Tenant Base Lab                  #
+########################################
+resource "aws_dynamodb_table_item" "lab_a09e1e9d" {
+  table_name = aws_dynamodb_table.lab_configuration.name
+  hash_key   = "lab_id"
+
+  item = jsonencode({
+    lab_id          = { S = "a09e1e9d" }
+    description     = { S = "App Tenant Base Lab" }
+    ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab" }
+    group_names     = { L = [
+      { S = "xc-lab-users" }
+    ]}
+    namespace_roles = { NULL = true }
+    user_ns         = { BOOL = true }
+    pre_lambda      = { NULL = true }
+    post_lambda     = { NULL = true }
+  })
+}
+
+
+########################################
 # API Lab                              #
 ########################################
 resource "aws_dynamodb_table_item" "lab_648ecc3e" {
