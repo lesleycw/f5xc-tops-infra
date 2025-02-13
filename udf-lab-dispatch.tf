@@ -1,10 +1,22 @@
 resource "aws_sqs_queue" "udf_queue" {
   name                      = "tops-udf-queue${var.environment == "prod" ? "" : "-${var.environment}"}"
-  message_retention_seconds = 3600
-  visibility_timeout_seconds = 60
+  message_retention_seconds = 60
+  visibility_timeout_seconds = 61
   delay_seconds             = 0
   receive_wait_time_seconds = 10
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.udf_dlq.arn
+    maxReceiveCount     = 1
+  })
 }
+
+resource "aws_sqs_queue" "udf_dlq" {
+  name = "tops-udf-dlq${var.environment == "prod" ? "" : "-${var.environment}"}"
+  message_retention_seconds = 259200
+}
+
+
 
 resource "aws_sqs_queue_policy" "udf_queue_policy" {
   queue_url = aws_sqs_queue.udf_queue.id
@@ -105,11 +117,22 @@ resource "aws_iam_policy" "udf_dispatch_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = [
-          "dynamodb:GetItem",   # ✅ Fetch a single item
-          "dynamodb:PutItem",   # ✅ Insert new records
-          "dynamodb:UpdateItem" # ✅ Update existing records (extend TTL)
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
         ],
         Resource = aws_dynamodb_table.lab_deployment_state.arn
+      },
+
+      # ✅ Allow Lambda to access the DLQ (optional, if needed for monitoring or retrying)
+      {
+        Effect   = "Allow",
+        Action   = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ],
+        Resource = aws_sqs_queue.udf_dlq.arn
       }
     ]
   })
