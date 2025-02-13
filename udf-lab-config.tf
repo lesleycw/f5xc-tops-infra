@@ -181,12 +181,7 @@ resource "aws_dynamodb_table_item" "lab_648ecc3e" {
     group_names     = { L = [
       { S = "xc-lab-users" }
     ]}
-    namespace_roles = { L = [
-      { M = {
-        namespace = { S = "system" }
-        role      = { S = "f5xc-web-app-scanning-user" }
-      }}
-    ]}
+    namespace_roles = { L = [] }
     user_ns         = { BOOL = true }
     pre_lambda      = { S = "${aws_lambda_function.apilab_pre_lambda.arn}" }
     post_lambda     = { NULL = true }
@@ -218,12 +213,7 @@ resource "aws_dynamodb_table_item" "lab_f85bfeb4" {
     group_names     = { L = [
       { S = "xc-lab-users" }
     ]}
-    namespace_roles = { L = [
-      { M = {
-        namespace = { S = "system" }
-        role      = { S = "f5xc-web-app-scanning-user" }
-      }}
-    ]}
+    namespace_roles = { L = [] }
     user_ns         = { BOOL = true }
     pre_lambda      = { S = "${aws_lambda_function.botlab_pre_lambda.arn}" }
     post_lambda     = { NULL = true }
@@ -255,12 +245,7 @@ resource "aws_dynamodb_table_item" "lab_811c573b" {
     group_names     = { L = [
       { S = "xc-lab-users" }
     ]}
-    namespace_roles = { L = [
-      { M = {
-        namespace = { S = "system" }
-        role      = { S = "f5xc-web-app-scanning-user" }
-      }}
-    ]}
+    namespace_roles = { L = [] }
     user_ns         = { BOOL = true }
     pre_lambda      = { S = "${aws_lambda_function.caaslab_pre_lambda.arn}" }
     post_lambda     = { NULL = true }
@@ -292,12 +277,7 @@ resource "aws_dynamodb_table_item" "lab_d3c24766" {
     group_names     = { L = [
       { S = "xc-lab-users" }
     ]}
-    namespace_roles = { L = [
-      { M = {
-        namespace = { S = "system" }
-        role      = { S = "f5xc-web-app-scanning-user" }
-      }}
-    ]}
+    namespace_roles = { L = [] }
     user_ns         = { BOOL = true }
     pre_lambda      = { S = "${aws_lambda_function.caaslab_pre_lambda.arn}" }
     post_lambda     = { NULL = true }
