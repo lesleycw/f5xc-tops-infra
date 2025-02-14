@@ -1,5 +1,5 @@
 resource "aws_dynamodb_table" "lab_configuration" {
-  name         = "tops-lab-config${var.environment == "prod" ? "" : "-${var.environment}"}"
+  name         = "tops-udf-lab-config${var.environment == "prod" ? "" : "-${var.environment}"}"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "lab_id"
 
@@ -9,6 +9,10 @@ resource "aws_dynamodb_table" "lab_configuration" {
   }
 }
 
+/*
+Don't change the name of this resource:
+It's hardcoded in the "udf-lab-service"
+*/
 resource "aws_s3_bucket" "lab_registry_bucket" {
   bucket        = "tops-registry-bucket${var.environment == "prod" ? "" : "-${var.environment}"}"
   force_destroy = true
