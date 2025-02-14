@@ -2,7 +2,7 @@
 UDF Worker Lambda
 */
 resource "aws_dynamodb_table" "lab_deployment_state" {
-  name         = "tops-lab-deployment-state${var.environment == "prod" ? "" : "-${var.environment}"}"
+  name         = "tops-udf-lab-deployment-state${var.environment == "prod" ? "" : "-${var.environment}"}"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "dep_id"
 
