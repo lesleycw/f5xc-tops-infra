@@ -60,7 +60,7 @@ data "aws_s3_object" "example_pre_zip" {
 
 resource "aws_lambda_function" "example_pre_lambda" {
   function_name    = "tops-udf-helper-example-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
-  role             = aws_iam_role.token_refresh_lambda_role.arn
+  role             = aws_iam_role.udf_helpers_lambda_role.arn
   runtime          = "python3.11"
   handler          = "function.lambda_handler"
   s3_bucket        = data.aws_s3_object.example_pre_zip.bucket
@@ -87,7 +87,7 @@ data "aws_s3_object" "apilab_pre_zip" {
 
 resource "aws_lambda_function" "apilab_pre_lambda" {
   function_name    = "tops-udf-helper-apilab-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
-  role             = aws_iam_role.token_refresh_lambda_role.arn
+  role             = aws_iam_role.udf_helpers_lambda_role.arn
   runtime          = "python3.11"
   handler          = "function.lambda_handler"
   s3_bucket        = data.aws_s3_object.apilab_pre_zip.bucket
@@ -114,7 +114,7 @@ data "aws_s3_object" "botlab_pre_zip" {
 
 resource "aws_lambda_function" "botlab_pre_lambda" {
   function_name    = "tops-udf-helper-botlab-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
-  role             = aws_iam_role.token_refresh_lambda_role.arn
+  role             = aws_iam_role.udf_helpers_lambda_role.arn
   runtime          = "python3.11"
   handler          = "function.lambda_handler"
   s3_bucket        = data.aws_s3_object.botlab_pre_zip.bucket
@@ -141,7 +141,7 @@ data "aws_s3_object" "caaslab_pre_zip" {
 
 resource "aws_lambda_function" "caaslab_pre_lambda" {
   function_name    = "tops-udf-helper-caaslab-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
-  role             = aws_iam_role.token_refresh_lambda_role.arn
+  role             = aws_iam_role.udf_helpers_lambda_role.arn
   runtime          = "python3.11"
   handler          = "function.lambda_handler"
   s3_bucket        = data.aws_s3_object.caaslab_pre_zip.bucket
@@ -168,7 +168,7 @@ data "aws_s3_object" "waaplab_pre_zip" {
 
 resource "aws_lambda_function" "waaplab_pre_lambda" {
   function_name    = "tops-udf-helper-waaplab-pre${var.environment == "prod" ? "" : "-${var.environment}"}"
-  role             = aws_iam_role.token_refresh_lambda_role.arn
+  role             = aws_iam_role.udf_helpers_lambda_role.arn
   runtime          = "python3.11"
   handler          = "function.lambda_handler"
   s3_bucket        = data.aws_s3_object.waaplab_pre_zip.bucket
