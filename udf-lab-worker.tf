@@ -101,9 +101,7 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
       {
         Effect   = "Allow",
         Action   = [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes"
+          "sqs:SendMessage"
         ],
         Resource = aws_sqs_queue.udf_dlq.arn
       }
