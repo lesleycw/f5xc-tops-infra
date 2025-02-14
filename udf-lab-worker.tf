@@ -94,8 +94,18 @@ resource "aws_iam_policy" "udf_worker_lambda_policy" {
         Resource = [
           "arn:aws:lambda:*:*:function:tops-user*",
           "arn:aws:lambda:*:*:function:tops-ns*",
-          "arn:aws:lambda:*:*:function:tops-helper*"
+          "arn:aws:lambda:*:*:function:tops-udf-helper*"
         ]
+      },
+      # ✅ Allow Lambda to access the DLQ (optional, if needed for monitoring or retrying)
+      {
+        Effect   = "Allow",
+        Action   = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ],
+        Resource = aws_sqs_queue.udf_dlq.arn
       }
     ]
   })
@@ -126,6 +136,10 @@ resource "aws_lambda_function" "udf_worker_lambda" {
     }
   }
 
+  dead_letter_config {
+    target_arn = aws_sqs_queue.udf_dlq.arn
+  }
+
   timeout     = var.lambda_timeout
   memory_size = var.lambda_memory_size
 
@@ -137,6 +151,7 @@ resource "aws_lambda_event_source_mapping" "udf_worker_dynamodb_trigger" {
   event_source_arn  = aws_dynamodb_table.lab_deployment_state.stream_arn
   starting_position = "LATEST"
   batch_size        = 1
+  maximum_retry_attempts = 0
   enabled           = true
 
   filter_criteria {
@@ -145,3 +160,4 @@ resource "aws_lambda_event_source_mapping" "udf_worker_dynamodb_trigger" {
     }
   }
 }
+

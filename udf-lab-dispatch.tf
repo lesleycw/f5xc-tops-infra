@@ -5,18 +5,12 @@ resource "aws_sqs_queue" "udf_queue" {
   delay_seconds             = 0
   receive_wait_time_seconds = 10
 
-  redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.udf_dlq.arn
-    maxReceiveCount     = 1
-  })
 }
 
 resource "aws_sqs_queue" "udf_dlq" {
   name = "tops-udf-dlq${var.environment == "prod" ? "" : "-${var.environment}"}"
   message_retention_seconds = 259200
 }
-
-
 
 resource "aws_sqs_queue_policy" "udf_queue_policy" {
   queue_url = aws_sqs_queue.udf_queue.id
@@ -122,17 +116,6 @@ resource "aws_iam_policy" "udf_dispatch_lambda_policy" {
           "dynamodb:UpdateItem"
         ],
         Resource = aws_dynamodb_table.lab_deployment_state.arn
-      },
-
-      # ✅ Allow Lambda to access the DLQ (optional, if needed for monitoring or retrying)
-      {
-        Effect   = "Allow",
-        Action   = [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes"
-        ],
-        Resource = aws_sqs_queue.udf_dlq.arn
       }
     ]
   })
