@@ -103,7 +103,7 @@ resource "aws_lambda_function" "acme_client_mcn_lambda" {
   environment {
     variables = {
       "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
-      "DOMAIN"        = "mcn-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
+      "DOMAIN"        = "lab-mcn${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
       "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket,
       "EMAIL"         = var.acme_email
     }
@@ -142,7 +142,7 @@ resource "aws_lambda_function" "acme_client_app_lambda" {
   environment {
     variables = {
       "CERT_NAME"     = "app-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
-      "DOMAIN"        = "app-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
+      "DOMAIN"        = "lab-app${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
       "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket,
       "EMAIL"         = var.acme_email
     }
@@ -181,7 +181,7 @@ resource "aws_lambda_function" "acme_client_sec_lambda" {
   environment {
     variables = {
       "CERT_NAME"     = "sec-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}",
-      "DOMAIN"        = "sec-lab${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
+      "DOMAIN"        = "lab-sec${var.environment == "prod" ? "" : "-${var.environment}"}.f5demos.com",
       "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket,
       "EMAIL"         = var.acme_email
     }
