@@ -166,7 +166,7 @@ resource "aws_lambda_function" "cert_mgmt_mcn_lambda" {
     variables = {
       "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/mcn-lab"
       "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket
-      "CERT_NAME"     = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
+      "CERT_NAME"     = "lab-mcn-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
     }
   }
 
@@ -198,7 +198,7 @@ resource "aws_lambda_function" "cert_mgmt_app_lambda" {
     variables = {
       "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/app-lab"
       "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket
-      "CERT_NAME"     = "app-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
+      "CERT_NAME"     = "lab-app-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
     }
   }
 
@@ -230,7 +230,7 @@ resource "aws_lambda_function" "cert_mgmt_sec_lambda" {
     variables = {
       "SSM_BASE_PATH" = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab"
       "S3_BUCKET"     = aws_s3_bucket.cert_bucket.bucket
-      "CERT_NAME"     = "sec-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
+      "CERT_NAME"     = "lab-sec-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}"
     }
   }
 
