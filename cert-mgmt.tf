@@ -133,19 +133,19 @@ resource "aws_s3_bucket_notification" "cert_upload_triggers" {
   lambda_function {
     lambda_function_arn = aws_lambda_function.cert_mgmt_mcn_lambda.arn
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "mcn-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
+    filter_prefix       = "lab-mcn-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
   }
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.cert_mgmt_app_lambda.arn
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "app-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
+    filter_prefix       = "lab-app-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
   }
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.cert_mgmt_sec_lambda.arn
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "sec-lab-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
+    filter_prefix       = "lab-sec-wildcard${var.environment == "prod" ? "" : "-${var.environment}"}/"
   }
 }
 
