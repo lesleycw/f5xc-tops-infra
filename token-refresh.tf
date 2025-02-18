@@ -80,7 +80,7 @@ resource "aws_lambda_function" "token_refresh_mcn_lambda" {
 resource "aws_cloudwatch_event_rule" "token_refresh_mcn_schedule" {
   name                = "tops-token-refresh-mcn-schedule"
   description         = "Scheduled trigger for token refresh Lambda"
-  schedule_expression = "cron(0 1 * * ? *)"
+  schedule_expression = "rate(12 hours)"
 }
 
 resource "aws_cloudwatch_event_target" "token_refresh_mcn_lambda_target" {
@@ -124,7 +124,7 @@ resource "aws_lambda_function" "token_refresh_sec_lambda" {
 resource "aws_cloudwatch_event_rule" "token_refresh_sec_schedule" {
   name                = "tops-token-refresh-sec-schedule"
   description         = "Scheduled trigger for token refresh Lambda"
-  schedule_expression = "cron(0 1 * * ? *)"
+  schedule_expression = "rate(12 hours)"
 }
 
 resource "aws_cloudwatch_event_target" "token_refresh_sec_lambda_target" {
@@ -169,7 +169,7 @@ resource "aws_lambda_function" "token_refresh_app_lambda" {
 resource "aws_cloudwatch_event_rule" "token_refresh_app_schedule" {
   name                = "tops-token-refresh-app-schedule"
   description         = "Scheduled trigger for token refresh Lambda"
-  schedule_expression = "cron(0 1 * * ? *)"
+  schedule_expression = "rate(12 hours)"
 }
 
 resource "aws_cloudwatch_event_target" "token_refresh_app_lambda_target" {
