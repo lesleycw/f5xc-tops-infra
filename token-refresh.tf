@@ -94,7 +94,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_token_refresh_mcn" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.token_refresh_mcn_lambda.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.token_refresh_schedule.arn
+  source_arn    = aws_cloudwatch_event_rule.token_refresh_mcn_schedule.arn
 }
 
 /*
@@ -138,7 +138,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_token_refresh_sec" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.token_refresh_sec_lambda.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.token_refresh_schedule.arn
+  source_arn    = aws_cloudwatch_event_rule.token_refresh_sec_schedule.arn
 }
 
 /*
@@ -183,5 +183,5 @@ resource "aws_lambda_permission" "allow_cloudwatch_token_refresh_app" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.token_refresh_app_lambda.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.token_refresh_schedule.arn
+  source_arn    = aws_cloudwatch_event_rule.token_refresh_app_schedule.arn
 }
