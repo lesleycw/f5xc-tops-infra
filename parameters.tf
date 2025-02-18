@@ -36,7 +36,7 @@ module "app_lab_parameters" {
     }
     "${local.app_base_path}/token-name" = {
       type        = "String"
-      value       = "tenant-ops-abkdibjd"
+      value       = "tenant-operations-ldfbcohs"
     }
     "${local.app_base_path}/token-value" = {
       type        = "SecureString"
@@ -60,7 +60,7 @@ module "mcn_lab_parameters" {
     }
     "${local.mcn_base_path}/token-name" = {
       type        = "String"
-      value       = "tenant-ops-mrflfitl"
+      value       = "tenant-operations-kubdrbpy"
     }
     "${local.mcn_base_path}/token-value" = {
       type        = "SecureString"
@@ -84,7 +84,7 @@ module "sec_lab_parameters" {
     }
     "${local.sec_base_path}/token-name" = {
       type        = "String"
-      value       = "tenant-ops-rcsodtbj"
+      value       = "tenant-operations-eawmoood"
     }
     "${local.sec_base_path}/token-value" = {
       type        = "SecureString"
