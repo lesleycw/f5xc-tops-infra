@@ -38,7 +38,7 @@ module "app_lab_parameters" {
       type        = "String"
       value       = "tenant-operations-ldfbcohs"
     }
-    "${local.mcn_base_path}/token-type" = {
+    "${local.app_base_path}/token-type" = {
       type        = "String"
       value       = "svccred"
     }
@@ -94,7 +94,7 @@ module "sec_lab_parameters" {
       type        = "String"
       value       = "tenant-operations-eawmoood"
     }
-    "${local.mcn_base_path}/token-type" = {
+    "${local.sec_base_path}/token-type" = {
       type        = "String"
       value       = "svccred"
     }
