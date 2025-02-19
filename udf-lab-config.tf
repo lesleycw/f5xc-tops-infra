@@ -326,7 +326,7 @@ resource "aws_dynamodb_table_item" "lab_d3c24766" {
     ]}
     namespace_roles = { L = [] }
     user_ns         = { BOOL = true }
-    pre_lambda      = { S = "${aws_lambda_function.caaslab_pre_lambda.arn}" }
+    pre_lambda      = { S = "${aws_lambda_function.waaplab_pre_lambda.arn}" }
     post_lambda     = { NULL = true }
   })
 }
