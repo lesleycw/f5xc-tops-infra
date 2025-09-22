@@ -174,12 +174,12 @@ EOT
 ########################################
 # Sec Tenant Base Lab                  #
 ########################################
-resource "aws_dynamodb_table_item" "lab_a09e1e9d" {
+resource "aws_dynamodb_table_item" "lab_a09e1eee" {
   table_name = aws_dynamodb_table.lab_configuration.name
   hash_key   = "lab_id"
 
   item = jsonencode({
-    lab_id          = { S = "a09e1e9d" }
+    lab_id          = { S = "a09e1eee" }
     description     = { S = "Sec Tenant Base Lab" }
     ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab" }
     group_names     = { L = [
@@ -203,6 +203,37 @@ EOT
   content_type = "text/yaml"
 }
 
+########################################
+# Sec Foundations Lab                  #
+########################################
+resource "aws_dynamodb_table_item" "lab_a09e1e9d" {
+  table_name = aws_dynamodb_table.lab_configuration.name
+  hash_key   = "lab_id"
+
+  item = jsonencode({
+    lab_id          = { S = "a09e1e9d" }
+    description     = { S = "Sec Foundations Lab" }
+    ssm_base_path   = { S = "/tenantOps${var.environment == "prod" ? "" : "-${var.environment}"}/sec-lab" }
+    group_names     = { L = [
+      { S = "xc-lab-users" }
+    ]}
+    namespace_roles = { L = [] }
+    user_ns         = { BOOL = true }
+    pre_lambda      = { NULL = true }
+    post_lambda     = { NULL = true }
+  })
+}
+
+resource "aws_s3_object" "lab_info_a09e1e9d" {
+  bucket  = aws_s3_bucket.lab_registry_bucket.bucket
+  key     = "a09e1e9d.yaml"
+  content = <<EOT
+lab_id: a09e1e9d
+sqsURL: "${aws_sqs_queue.udf_queue.url}"
+EOT
+
+  content_type = "text/yaml"
+}
 
 ########################################
 # API Lab                              #
